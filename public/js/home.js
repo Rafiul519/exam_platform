@@ -59,7 +59,7 @@ async function checkLiveExamStatus() {
     document.getElementById('liveExamTitle').textContent = exam.exam_name;
     const scheduleDateStr = new Date(exam.scheduled_at * 1000).toLocaleString();
     document.getElementById('liveExamMeta').textContent =
-      `Scheduled: ${scheduleDateStr} • Total Questions: ${exam.total_questions} • Unlimited Analysis Time ⌚`;
+      `Scheduled: ${scheduleDateStr} • Total Questions: ${exam.total_questions} • No Time Tilme Limit⌚`;
 
     // Start countdown or immediately show Name Input if time has arrived
     startExamCountdown(exam.scheduled_at);

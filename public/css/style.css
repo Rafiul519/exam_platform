@@ -1,74 +1,166 @@
-
 /* ============================================================================
    FILE: public/css/style.css
+   DESIGN SYSTEM: Premium Editorial & Academic White Glassmorphism
    PURPOSE:
-   Mobile-first, high-speed UI design system with Glassmorphism topbar,
-   distraction-free live exam layout, color-coded question palette,
-   and clean Print-to-PDF media rules.
+   World-class, distraction-free Live Exam & Analytics Portal UI.
+   Engineered to preserve 100% of existing HTML structure, IDs, classes,
+   and JavaScript inline injections while transforming the visual layer into
+   a warm ivory, champagne-gold, and muted-emerald editorial interface.
    ============================================================================ */
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+
 :root {
-  --bg-main: #0b1120;
-  --bg-card: rgba(30, 41, 59, 0.78);
-  --bg-card-solid: #1e293b;
-  --bg-glass: rgba(15, 23, 42, 0.82);
-  --border-subtle: rgba(148, 163, 184, 0.16);
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --primary: #3b82f6;
-  --primary-hover: #2563eb;
-  --emerald: #10b981;     /* Answered / Right */
-  --amber: #f59e0b;       /* Skipped / Visited */
-  --rose: #ef4444;        /* Wrong / Danger */
-  --slate: #334155;       /* Unvisited */
-  --radius-lg: 16px;
+  /* 1. Primary Editorial Background Palette */
+  --bg-main: #F7F6F1;            /* Warm Ivory */
+  --bg-pearl: #F0EFE8;           /* Soft Pearl */
+  --bg-neutral: #E9E8DF;         /* Light Neutral */
+
+  /* 2. Frosted White Glassmorphism Surfaces */
+  --bg-card: rgba(255, 255, 255, 0.76);
+  --bg-card-solid: #FFFFFF;
+  --bg-glass: rgba(247, 246, 241, 0.84);
+  --bg-surface-subtle: rgba(240, 239, 232, 0.65);
+  --bg-surface-elevated: rgba(255, 255, 255, 0.92);
+
+  /* 3. Borders & Delicate Highlights */
+  --border-subtle: rgba(37, 42, 37, 0.09);
+  --border-strong: rgba(37, 42, 37, 0.16);
+  --border-gold: rgba(181, 150, 92, 0.42);
+  --inner-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+
+  /* 4. Editorial Typography Hierarchy */
+  --text-main: #252A25;          /* Deep Forest Charcoal */
+  --text-secondary: #62695F;     /* Muted Botanical Slate */
+  --text-muted: #858A80;         /* Warm Stone Muted */
+
+  /* 5. Accents & Academic Status Colors (Zero Heavy Blue / Zero Neon) */
+  --primary: #B5965C;            /* Champagne Gold */
+  --primary-hover: #A9824D;      /* Warm Bronze */
+  --primary-soft: rgba(181, 150, 92, 0.13);
+
+  --emerald: #54866A;            /* Muted Emerald (Answered / Right / Success) */
+  --emerald-hover: #436E56;
+  --emerald-soft: rgba(84, 134, 106, 0.12);
+
+  --sage: #8DA58A;               /* Soft Sage */
+
+  --amber: #C88A36;              /* Warm Amber (Skipped / Visited / Warning) */
+  --amber-soft: rgba(200, 138, 54, 0.13);
+
+  --rose: #C25953;               /* Muted Coral Red (Wrong / Error) */
+  --rose-soft: rgba(194, 89, 83, 0.12);
+
+  --slate: #E9E8DF;              /* Light Neutral Stone (Unvisited Palette State) */
+  --slate-text: #62695F;
+
+  /* 6. Geometry, Shadows & Transitions */
+  --radius-lg: 18px;
   --radius-md: 12px;
-  --shadow-soft: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  --radius-sm: 8px;
+
+  --shadow-soft: 
+    0 12px 32px -8px rgba(37, 42, 37, 0.05),
+    0 4px 12px -2px rgba(37, 42, 37, 0.03),
+    var(--inner-highlight);
+
+  --shadow-hover: 
+    0 18px 38px -10px rgba(37, 42, 37, 0.08),
+    0 6px 16px -3px rgba(37, 42, 37, 0.04),
+    var(--inner-highlight);
+
+  --shadow-modal: 
+    0 24px 60px -12px rgba(37, 42, 37, 0.18),
+    0 8px 24px -4px rgba(37, 42, 37, 0.08);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-fast: 160ms var(--ease-out);
+  --transition-smooth: 260ms var(--ease-out);
 }
 
-* {
+/* ============================================================================
+   BASE RESET & EDITORIAL TYPOGRAPHY
+   ============================================================================ */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   -webkit-tap-highlight-color: transparent;
 }
 
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: radial-gradient(circle at top right, #1e293b 0%, #0b1120 60%);
+  background-color: var(--bg-main);
+  background-image: 
+    radial-gradient(circle at 12% 0%, rgba(181, 150, 92, 0.07) 0%, transparent 45%),
+    radial-gradient(circle at 88% 8%, rgba(141, 165, 138, 0.09) 0%, transparent 50%),
+    linear-gradient(180deg, var(--bg-main) 0%, var(--bg-pearl) 100%);
+  background-attachment: fixed;
   color: var(--text-main);
   min-height: 100vh;
-  line-height: 1.5;
-  padding-bottom: 90px; /* Space for mobile bottom drawer */
+  line-height: 1.6;
+  padding-bottom: 84px;
+  overflow-x: hidden;
+  animation: pageEntrance 320ms var(--ease-out);
+}
+
+@keyframes pageEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h1, h2, h3, .brand, .card-title, .stat-num, .time-val, .q-number-badge {
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.02em;
 }
 
 /* ============================================================================
-   1. GLASSMORPHISM TOPBAR NAVIGATION
+   1. SOPHISTICATED FROSTED WHITE GLASS TOPBAR
    ============================================================================ */
 .topbar {
   position: sticky;
   top: 0;
   z-index: 100;
   background: var(--bg-glass);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
   border-bottom: 1px solid var(--border-subtle);
-  padding: 12px 16px;
+  box-shadow: 0 2px 14px -4px rgba(37, 42, 37, 0.04);
+  padding: 13px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  transition: background var(--transition-smooth), box-shadow var(--transition-smooth);
 }
 
 .brand {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
   font-weight: 800;
-  font-size: 1.15rem;
-  letter-spacing: -0.02em;
-  color: #fff;
+  font-size: 1.08rem;
+  letter-spacing: -0.025em;
+  color: var(--text-main);
   text-decoration: none;
+  transition: opacity var(--transition-fast);
+}
+
+.brand:hover {
+  opacity: 0.85;
 }
 
 .brand-dot {
@@ -76,64 +168,88 @@ body {
   height: 10px;
   border-radius: 50%;
   background: var(--emerald);
-  box-shadow: 0 0 12px var(--emerald);
+  box-shadow: 0 0 0 3px rgba(84, 134, 106, 0.2);
+  flex-shrink: 0;
 }
 
 .nav-links {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 /* ============================================================================
-   2. CONTAINERS, GRID & CARDS
+   2. CONTAINERS, GRID & FROSTED GLASS CARDS
    ============================================================================ */
 .container {
-  max-width: 1080px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 18px 14px;
+  padding: 24px 16px;
 }
 
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
+  gap: 20px;
 }
 
 @media (min-width: 768px) {
+  .container {
+    padding: 32px 24px;
+  }
   .grid-2 {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
   }
 }
 
 .card {
   background: var(--bg-card);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 24px;
   box-shadow: var(--shadow-soft);
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  transition: 
+    transform var(--transition-smooth),
+    box-shadow var(--transition-smooth),
+    border-color var(--transition-smooth);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(37, 42, 37, 0.13);
+}
+
+/* Keep the live question workspace calm & stationary during exams */
+#questionWorkspace:hover {
+  transform: none;
 }
 
 .card-title {
-  font-size: 1.15rem;
+  font-size: 1.16rem;
   font-weight: 700;
+  color: var(--text-main);
   margin-bottom: 6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .card-subtitle {
-  font-size: 0.88rem;
-  color: var(--text-muted);
-  margin-bottom: 16px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 18px;
+  line-height: 1.55;
 }
 
 /* ============================================================================
-   3. BUTTONS, INPUTS & BADGES
+   3. FORM CONTROLS, BUTTONS & REFINED BADGES
    ============================================================================ */
 .input-group {
   display: flex;
@@ -145,23 +261,41 @@ body {
 @media (min-width: 520px) {
   .input-group.row {
     flex-direction: row;
+    align-items: stretch;
   }
 }
 
 input, select, textarea {
   width: 100%;
-  padding: 13px 14px;
+  padding: 12px 15px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-surface-elevated);
   color: var(--text-main);
-  font-size: 0.96rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
   outline: none;
-  transition: border-color 0.2s;
+  box-shadow: inset 0 1px 2px rgba(37, 42, 37, 0.03);
+  transition: 
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+input:hover, select:hover, textarea:hover {
+  border-color: rgba(37, 42, 37, 0.26);
 }
 
 input:focus, select:focus, textarea:focus {
+  background: var(--bg-card-solid);
   border-color: var(--primary);
+  box-shadow: 0 0 0 3.5px rgba(181, 150, 92, 0.16);
 }
 
 .btn {
@@ -169,129 +303,210 @@ input:focus, select:focus, textarea:focus {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 13px 18px;
+  padding: 12px 20px;
   border-radius: var(--radius-md);
-  border: none;
+  border: 1px solid transparent;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.93rem;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
   cursor: pointer;
-  transition: transform 0.12s ease, opacity 0.2s ease, background 0.2s ease;
   text-decoration: none;
-  color: #fff;
+  white-space: nowrap;
+  color: #FFFFFF;
   background: var(--primary);
+  box-shadow: 
+    0 4px 12px -2px rgba(181, 150, 92, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transition: 
+    transform var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast),
+    border-color var(--transition-fast),
+    opacity var(--transition-fast);
 }
 
-.btn:active {
-  transform: scale(0.98);
+.btn:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -3px rgba(169, 130, 77, 0.36);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
 }
 
 .btn:disabled {
-  opacity: 0.5;
+  opacity: 0.48;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
-.btn-emerald { background: var(--emerald); }
-.btn-amber { background: var(--amber); color: #0f172a; }
-.btn-rose { background: var(--rose); }
+.btn-emerald {
+  background: var(--emerald);
+  box-shadow: 
+    0 4px 12px -2px rgba(84, 134, 106, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-emerald:hover:not(:disabled) {
+  background: var(--emerald-hover);
+  box-shadow: 0 6px 16px -3px rgba(84, 134, 106, 0.35);
+}
+
+.btn-amber {
+  background: var(--amber);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px -2px rgba(200, 138, 54, 0.26);
+}
+
+.btn-amber:hover:not(:disabled) {
+  background: #B3792B;
+}
+
+.btn-rose {
+  background: var(--rose);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px -2px rgba(194, 89, 83, 0.26);
+}
+
+.btn-rose:hover:not(:disabled) {
+  background: #AD4B45;
+}
+
 .btn-outline {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--border-strong);
   color: var(--text-main);
+  box-shadow: 0 2px 5px rgba(37, 42, 37, 0.03);
 }
-.btn-block { width: 100%; }
 
+.btn-outline:hover:not(:disabled) {
+  background: var(--bg-card-solid);
+  border-color: var(--primary);
+  color: var(--text-main);
+  box-shadow: 0 4px 12px rgba(37, 42, 37, 0.06);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* Status Badges */
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 5px 11px;
   border-radius: 999px;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.045em;
+  line-height: 1;
 }
 
 .badge-live {
-  background: rgba(16, 185, 129, 0.18);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: var(--emerald-soft);
+  color: var(--emerald);
+  border: 1px solid rgba(84, 134, 106, 0.32);
 }
 
 .badge-wait {
-  background: rgba(245, 158, 11, 0.18);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.35);
+  background: var(--amber-soft);
+  color: #9C671E;
+  border: 1px solid rgba(200, 138, 54, 0.32);
 }
 
 .badge-closed {
-  background: rgba(148, 163, 184, 0.15);
-  color: #94a3b8;
+  background: var(--bg-neutral);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
 }
 
 /* ============================================================================
-   4. COUNTDOWN CLOCK BOXES (HOME & 2-MINUTE RESULT QUARANTINE)
+   4. COUNTDOWN CLOCK BOXES (HOME & RESULT QUARANTINE)
    ============================================================================ */
 .countdown-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
   margin: 16px 0;
 }
 
 .time-box {
-  background: rgba(15, 23, 42, 0.9);
+  background: var(--bg-surface-elevated);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 12px 6px;
+  padding: 14px 8px;
   text-align: center;
+  box-shadow: 
+    0 4px 12px -4px rgba(37, 42, 37, 0.04),
+    var(--inner-highlight);
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.time-box:hover {
+  border-color: var(--border-gold);
+  transform: translateY(-1px);
 }
 
 .time-val {
-  font-size: 1.55rem;
+  font-size: 1.6rem;
   font-weight: 800;
-  color: #38bdf8;
+  color: var(--primary-hover);
   font-variant-numeric: tabular-nums;
+  line-height: 1.15;
 }
 
 .time-lbl {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
+  font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
-  margin-top: 2px;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
 }
 
 /* ============================================================================
-   5. LIVE EXAM PAGE: ULTRA-CLEAN QUESTION & OPTIONS UI
+   5. DISTRACTION-FREE LIVE EXAM INTERFACE
    ============================================================================ */
 .exam-layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 18px;
-  max-width: 1140px;
+  gap: 22px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 14px;
+  padding: 20px 14px;
 }
 
-@media (min-width: 920px) {
+@media (min-width: 940px) {
   .exam-layout {
-    grid-template-columns: 1fr 310px;
+    grid-template-columns: minmax(0, 1fr) 330px;
     align-items: start;
+    padding: 28px 24px;
+  }
+  .exam-layout > aside.card {
+    position: sticky;
+    top: 78px;
   }
 }
 
 .stopwatch-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(15, 23, 42, 0.95);
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  padding: 6px 12px;
+  gap: 7px;
+  background: var(--bg-card-solid);
+  border: 1px solid var(--border-gold);
+  padding: 6px 14px;
   border-radius: 999px;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
   font-weight: 700;
-  font-size: 0.92rem;
-  color: #38bdf8;
+  font-size: 0.9rem;
+  color: var(--text-main);
   font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 8px rgba(181, 150, 92, 0.12);
 }
 
 .q-meta-bar {
@@ -299,32 +514,33 @@ input:focus, select:focus, textarea:focus {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 14px;
-  padding-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .q-number-badge {
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   font-weight: 800;
-  color: #38bdf8;
+  color: var(--primary-hover);
 }
 
 .q-text {
-  font-size: 1.12rem;
+  font-size: 1.14rem;
   font-weight: 600;
-  line-height: 1.6;
-  margin-bottom: 20px;
-  color: #f8fafc;
-  user-select: none; /* Prevents easy copy-paste */
+  line-height: 1.7;
+  margin-bottom: 24px;
+  color: var(--text-main);
+  letter-spacing: -0.005em;
+  user-select: none;
 }
 
 .options-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 22px;
+  margin-bottom: 26px;
 }
 
 .option-btn {
@@ -333,43 +549,68 @@ input:focus, select:focus, textarea:focus {
   gap: 14px;
   width: 100%;
   text-align: left;
-  padding: 14px 16px;
+  padding: 15px 18px;
   border-radius: var(--radius-md);
-  border: 1.5px solid var(--border-subtle);
-  background: rgba(15, 23, 42, 0.65);
+  border: 1.5px solid var(--border-strong);
+  background: var(--bg-surface-elevated);
   color: var(--text-main);
+  font-family: inherit;
   font-size: 0.98rem;
+  font-weight: 500;
+  line-height: 1.5;
   cursor: pointer;
-  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(37, 42, 37, 0.02);
+  transition: 
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .option-btn:hover {
-  border-color: rgba(59, 130, 246, 0.5);
-  background: rgba(30, 41, 59, 0.9);
+  border-color: var(--primary);
+  background: var(--bg-card-solid);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px -4px rgba(37, 42, 37, 0.06);
+}
+
+.option-btn:active {
+  transform: translateY(0);
 }
 
 .option-btn.selected {
   border-color: var(--emerald);
-  background: rgba(16, 185, 129, 0.14);
+  background: linear-gradient(90deg, rgba(84, 134, 106, 0.11) 0%, rgba(255, 255, 255, 0.95) 100%);
+  box-shadow: 0 4px 14px -3px rgba(84, 134, 106, 0.16);
 }
 
 .opt-letter {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
-  background: var(--slate);
-  color: #fff;
+  background: var(--bg-neutral);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 800;
   font-size: 0.9rem;
   flex-shrink: 0;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.option-btn:hover .opt-letter {
+  border-color: var(--border-gold);
+  background: var(--primary-soft);
+  color: var(--primary-hover);
 }
 
 .option-btn.selected .opt-letter {
   background: var(--emerald);
-  color: #052e16;
+  border-color: var(--emerald);
+  color: #FFFFFF;
 }
 
 /* ============================================================================
@@ -379,37 +620,55 @@ input:focus, select:focus, textarea:focus {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .q-sheet-btn {
   height: 42px;
   border-radius: 10px;
-  border: 1.5px solid transparent;
-  background: var(--slate);
-  color: #e2e8f0;
+  border: 1.5px solid var(--border-subtle);
+  background: var(--bg-pearl);
+  color: var(--text-secondary);
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: 
+    transform var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
-/* Color codes for Selected vs Skipped vs Current */
+.q-sheet-btn:hover {
+  border-color: var(--primary);
+  color: var(--text-main);
+  transform: translateY(-1px);
+}
+
+/* Answered / Selected State */
 .q-sheet-btn.answered {
   background: var(--emerald);
-  color: #052e16;
+  border-color: var(--emerald);
+  color: #FFFFFF;
+  box-shadow: 0 3px 8px -2px rgba(84, 134, 106, 0.35);
 }
 
+/* Skipped / Visited State */
 .q-sheet-btn.skipped {
-  background: var(--amber);
-  color: #0f172a;
+  background: var(--amber-soft);
+  border-color: rgba(200, 138, 54, 0.45);
+  color: #8C5A16;
 }
 
+/* Current Active Question Focus Ring */
 .q-sheet-btn.current {
-  border-color: #38bdf8;
-  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.4);
+  border-color: var(--text-main);
+  box-shadow: 0 0 0 3px rgba(181, 150, 92, 0.35);
+  transform: scale(1.03);
 }
 
 .legend-row {
@@ -417,8 +676,13 @@ input:focus, select:focus, textarea:focus {
   flex-wrap: wrap;
   gap: 12px;
   font-size: 0.78rem;
-  color: var(--text-muted);
-  margin-bottom: 10px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  background: var(--bg-surface-subtle);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
 }
 
 .legend-dot {
@@ -426,7 +690,9 @@ input:focus, select:focus, textarea:focus {
   height: 10px;
   border-radius: 3px;
   display: inline-block;
-  margin-right: 4px;
+  margin-right: 5px;
+  vertical-align: middle;
+  border: 1px solid rgba(37, 42, 37, 0.12);
 }
 
 /* ============================================================================
@@ -436,8 +702,9 @@ input:focus, select:focus, textarea:focus {
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: rgba(2, 6, 23, 0.85);
+  background: rgba(37, 42, 37, 0.38);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: none;
   align-items: center;
   justify-content: center;
@@ -446,92 +713,246 @@ input:focus, select:focus, textarea:focus {
 
 .modal-backdrop.active {
   display: flex;
+  animation: backdropFade 200ms var(--ease-out);
 }
 
 .modal-card {
   background: var(--bg-card-solid);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
-  padding: 22px;
+  padding: 26px;
   width: 100%;
-  max-width: 440px;
-  box-shadow: var(--shadow-soft);
+  max-width: 450px;
+  box-shadow: var(--shadow-modal);
+  animation: modalSlideUp 240ms var(--ease-out);
+}
+
+@keyframes backdropFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* ============================================================================
-   8. RESULT STATS & PDF PRINT MEDIA RULES
+   8. ANALYTICS, STATS GRID, PROGRESS & EDITORIAL TABLES
    ============================================================================ */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 @media (min-width: 640px) {
   .stats-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 14px;
   }
 }
 
 .stat-box {
-  background: rgba(15, 23, 42, 0.75);
+  background: var(--bg-surface-elevated);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 14px;
+  padding: 16px 12px;
   text-align: center;
+  box-shadow: 
+    0 4px 10px -4px rgba(37, 42, 37, 0.03),
+    var(--inner-highlight);
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.stat-box:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-gold);
 }
 
 .stat-num {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.2;
 }
 
 .stat-label {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  margin-top: 2px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
 }
 
+/* Analytics Progress Bars & Chart Containers */
+.progress-bar, .progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-neutral);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--emerald) 100%);
+  border-radius: 999px;
+  transition: width 400ms var(--ease-out);
+}
+
+/* Editorial Tables */
 .table-wrap {
+  width: 100%;
   overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-elevated);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.88rem;
+  min-width: 540px;
 }
 
 th, td {
-  padding: 10px 12px;
+  padding: 13px 15px;
   text-align: left;
   border-bottom: 1px solid var(--border-subtle);
 }
 
 th {
-  color: var(--text-muted);
-  font-weight: 600;
+  background: var(--bg-pearl);
+  color: var(--text-secondary);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
+tbody tr {
+  transition: background var(--transition-fast);
+}
+
+tbody tr:hover {
+  background: rgba(181, 150, 92, 0.05);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ============================================================================
+   9. SEAMLESS INLINE-STYLE HARMONIZATION
+   Ensures hardcoded dark-mode inline styles in existing HTML & JS files
+   (e.g., rgba(15,23,42,...), #38bdf8, #fbbf24) adapt gracefully to the
+   Warm Ivory & Champagne Gold light theme without modifying HTML/JS files.
+   ============================================================================ */
+#liveExamBox > div[style*="rgba(15,23,42"],
+#liveExamBox > div[style*="rgba(15, 23, 42"],
+#postSubmitModal div[style*="rgba(15, 23, 42"],
+#searchResultsList div[style*="rgba(15,23,42"],
+#searchResultsList div[style*="rgba(15, 23, 42"] {
+  background: var(--bg-surface-elevated) !important;
+  border: 1px solid var(--border-subtle) !important;
+  box-shadow: 0 4px 12px -4px rgba(37, 42, 37, 0.04);
+}
+
+/* Harmonize hardcoded sky-blue (#38bdf8) inline text to Champagne Bronze */
+#profStudentName,
+#profAvgScore,
+#liveExamTitle,
+#qCurrentTimer,
+#twoMinCountdown,
+#profHistoryTable strong[style*="#38bdf8"] {
+  color: var(--primary-hover) !important;
+}
+
+/* Harmonize hardcoded bright yellow (#fbbf24) inline text to readable Warm Amber */
+#clearSelectionBtn,
+#countdownWrapper p[style*="#fbbf24"],
+#postSubmitModal p[style*="#fbbf24"] {
+  color: #9C671E !important;
+}
+
+/* Harmonize strong/weak topic pills in profile.html */
+#profStrongList > div {
+  background: var(--emerald-soft) !important;
+  border: 1px solid rgba(84, 134, 106, 0.25);
+  color: var(--text-main);
+}
+
+#profWeakList > div {
+  background: var(--amber-soft) !important;
+  border: 1px solid rgba(200, 138, 54, 0.28);
+  color: var(--text-main);
+}
+
+/* ============================================================================
+   10. MOBILE-FIRST RESPONSIVE REFINEMENTS & REDUCED MOTION
+   ============================================================================ */
+@media (max-width: 480px) {
+  .topbar {
+    padding: 11px 14px;
+  }
+  .brand {
+    font-size: 0.98rem;
+  }
+  .card {
+    padding: 18px 16px;
+    border-radius: 15px;
+  }
+  .time-val {
+    font-size: 1.35rem;
+  }
+  .q-text {
+    font-size: 1.04rem;
+  }
+  .option-btn {
+    padding: 13px 14px;
+    font-size: 0.94rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================================
+   11. CLEAN PRINT-TO-PDF MEDIA RULES
+   ============================================================================ */
 @media print {
   body {
-    background: #fff !important;
-    color: #000 !important;
+    background: #FFFFFF !important;
+    color: #000000 !important;
     padding: 0 !important;
   }
   .no-print, .topbar {
     display: none !important;
   }
-  .card, .stat-box {
-    background: #fff !important;
-    color: #000 !important;
-    border: 1px solid #cbd5e1 !important;
+  .card, .stat-box, .time-box {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    border: 1px solid #CBD5E1 !important;
     box-shadow: none !important;
     break-inside: avoid;
   }
-  .q-text, td, th {
-    color: #000 !important;
+  .q-text, td, th, .stat-num, .card-title {
+    color: #000000 !important;
   }
-  }
-  
+}

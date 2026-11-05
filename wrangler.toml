@@ -1,25 +1,30 @@
+# ============================================================================
+# Cloudflare Worker Configuration
+# ============================================================================
+
 # Name of your Cloudflare Worker project
 name = "exam-platform"
 
 # The main entry file for our backend API
 main = "src/index.js"
 
-# Compatibility date ensures modern Cloudflare Worker features are active
-compatibility_date = "2024-10-01"
+# Updated compatibility date for modern Cloudflare Workers runtime features
+compatibility_date = "2026-03-01"
 
 # Serves our HTML/CSS/JS frontend files from the 'public' folder
-# CRITICAL FIX: run_worker_first = true ensures /api/* routes always hit Hono first!
+# run_worker_first = true ensures /api/* routes always hit Hono backend first!
 [assets]
 directory = "./public"
 binding = "ASSETS"
 run_worker_first = true
 
-# Connects our Cloudflare D1 SQLite Database to the backend via 'c.env.DB'
+# Connects your Cloudflare D1 SQLite Database to the backend via c.env.DB
 [[d1_databases]]
 binding = "DB"
 database_name = "exam_db"
-database_id = "1a38594a-fd52-48a9-a00d-3e75103ba5c4" # <-- Keep your existing Database ID here!
+database_id = "1a38594a-fd52-48a9-a00d-3e75103ba5c4"
 
+# Environment Variables & Secrets
 [vars]
 JWT_SECRET = "super-secret-key-change-this-in-production-987654321"
 ADMIN_PASSWORD = "admin123secure"

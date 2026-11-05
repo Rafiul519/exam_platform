@@ -16,7 +16,7 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "exam_db"
-database_id = "PASTE_YOUR_D1_DATABASE_ID_HERE" # <-- Replace with your ID from terminal!
+database_id = "1a38594a-fd52-48a9-a00d-3e75103ba5c4" # <-- Replace with your ID from terminal!
 
 # Environment variables (Secrets for signing tokens and admin login)
 # In production, you can also set these securely via: npx wrangler secret put JWT_SECRET

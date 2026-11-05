@@ -1,1 +1,130 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Exam & Analytics Portal</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <!-- GLASSMORPHISM TOPBAR -->
+  <header class="topbar">
+    <a href="/" class="brand">
+      <span class="brand-dot"></span>
+      <span>EXAM PORTAL</span>
+    </a>
+    <nav class="nav-links">
+      <a href="/admin.html" class="btn btn-outline" style="padding: 8px 12px; font-size: 0.82rem;">
+        Admin Panel
+      </a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="grid-2">
+
+      <!-- SECTION 1: LIVE TEST CONDUCTING STATUS & COUNTDOWN -->
+      <section class="card">
+        <div class="card-title">
+          <span>🎯 Live Examination</span>
+          <span id="examStatusBadge" class="badge badge-closed">Checking...</span>
+        </div>
+        <p id="examSubtitle" class="card-subtitle">
+          Checking server for scheduled live examination...
+        </p>
+
+        <!-- Shown when NO live exam is active -->
+        <div id="noExamBox" style="display: none; padding: 20px 0; text-align: center;">
+          <p style="color: var(--text-muted); font-size: 0.95rem;">
+            No live test is currently scheduled. Please check back later or search your previous test results.
+          </p>
+        </div>
+
+        <!-- Shown when Live Exam IS Available -->
+        <div id="liveExamBox" style="display: none;">
+          <div style="background: rgba(15,23,42,0.65); padding: 12px; border-radius: 12px; margin-bottom: 14px; border: 1px solid var(--border-subtle);">
+            <div id="liveExamTitle" style="font-weight: 800; font-size: 1.08rem; color: #38bdf8;"></div>
+            <div id="liveExamMeta" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;"></div>
+          </div>
+
+          <!-- COUNTDOWN BOX (Visible BEFORE exam start time) -->
+          <div id="countdownWrapper" style="display: none;">
+            <p style="font-size: 0.84rem; color: #fbbf24; font-weight: 600; text-align: center;">
+              ⏳ Exam starts automatically when countdown finishes:
+            </p>
+            <div class="countdown-grid">
+              <div class="time-box">
+                <div class="time-val" id="cdDays">00</div>
+                <div class="time-lbl">Days</div>
+              </div>
+              <div class="time-box">
+                <div class="time-val" id="cdHours">00</div>
+                <div class="time-lbl">Hours</div>
+              </div>
+              <div class="time-box">
+                <div class="time-val" id="cdMins">00</div>
+                <div class="time-lbl">Minutes</div>
+              </div>
+              <div class="time-box">
+                <div class="time-val" id="cdSecs">00</div>
+                <div class="time-lbl">Seconds</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ENTER NAME TO START TEST (Visible AFTER countdown hits 00:00:00) -->
+          <form id="startExamForm" style="display: none; margin-top: 14px;">
+            <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:6px;">
+              Countdown Complete! Enter your Full Name to enter the Live Test:
+            </label>
+            <div class="input-group">
+              <input
+                type="text"
+                id="studentNameInput"
+                placeholder="Enter your full name (e.g., Aynal Haque)"
+                required
+                minlength="2"
+                maxlength="60"
+              />
+              <button type="submit" id="startExamBtn" class="btn btn-emerald btn-block">
+                🚀 Enter Live Test Now
+              </button>
+            </div>
+            <p id="startExamError" style="color: var(--rose); font-size: 0.85rem; display: none;"></p>
+          </form>
+        </div>
+      </section>
+
+      <!-- SECTION 2: FIND THE RESULT BY STUDENT NAME -->
+      <section class="card">
+        <div class="card-title">
+          <span>🔍 Find Your Result</span>
+        </div>
+        <p class="card-subtitle">
+          Enter your name to check your test score, topic-wise analysis, and download your question paper PDF.
+        </p>
+
+        <form id="searchResultForm" class="input-group row">
+          <input
+            type="text"
+            id="searchNameInput"
+            placeholder="Search by Student Name..."
+            required
+            minlength="2"
+          />
+          <button type="submit" id="searchBtn" class="btn">Search</button>
+        </form>
+
+        <!-- Search Results Container -->
+        <div id="searchResultsList" style="margin-top: 14px;"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="/js/home.js"></script>
+</body>
+          </html>
+  

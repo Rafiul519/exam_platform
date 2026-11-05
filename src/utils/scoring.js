@@ -259,7 +259,18 @@ export function evaluateSubmission(dbQuestions, studentResponses, serverElapsedS
   const totalQuestions = orderedQuestions.length;
   const scorePercentage = totalQuestions > 0 ? Number(((totalRight / totalQuestions) * 100).toFixed(2)) : 0;
   const avgTimePerQ = totalSelected > 0 ? Number((totalTimeSec / totalSelected).toFixed(1)) : 0;
-
+  // --- NEET MARKING SCHEME CALCULATION ---
+  const totalQuestions = orderedQuestions.length;
+  
+  // Official NEET: +4 for Right, -1 for Wrong, 0 for Skipped
+  const neetTotalMarks = (totalRight * 4) - (totalWrong * 1);
+  const maxPossibleMarks = totalQuestions * 4;
+  
+  // Score percentage based on NEET marks (or raw correct ratio)
+  const scorePercentage = maxPossibleMarks > 0 
+    ? Number(((neetTotalMarks / maxPossibleMarks) * 100).toFixed(2)) 
+    : 0;
+    
   return {
     totalQuestions: totalQuestions,
     totalSelected: totalSelected,

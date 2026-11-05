@@ -1,3 +1,45 @@
+// Direct function jo button click hote hi chal padegi aur server tak request legi
+async function directAdminLogin() {
+  const passwordInput = document.getElementById('adminPasswordInput');
+  const errEl = document.getElementById('loginErrorMsg');
+  errEl.style.display = 'none';
+  errEl.textContent = '';
+
+  const password = passwordInput ? passwordInput.value.trim() : '';
+
+  if (!password) {
+    errEl.textContent = 'Please enter password!';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  try {
+    // Yehi URL batayega ki request server tak gayi ya nahi
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    });
+
+    const data = await res.json();
+
+    if (!data.success || !data.token) {
+      errEl.textContent = data.error || 'Incorrect Admin Password';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    // Success! Save token and unlock dashboard
+    adminToken = data.token;
+    localStorage.setItem('admin_jwt_token', adminToken);
+    unlockDashboard();
+  } catch (err) {
+    errEl.textContent = 'Network/Server connection failed: ' + err.message;
+    errEl.style.display = 'block';
+  }
+}
+
+
 // Add inside loadChapterBundlebs or as a dedicated render function for chapter deletion:
 async function loadChapterManagement() {
   const container = document.getElementById('chapterManagementList');

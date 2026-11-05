@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student Profile</title>
+  <title>Student Profile & Analytics</title>
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
@@ -17,9 +17,9 @@
   <main class="container">
     <section class="card" style="max-width: 500px; margin: 20px auto;">
       <div class="card-title">🔍 Lookup Student Profile</div>
-      <p class="card-subtitle">Enter your name to view your exam history, highest score, and performance analytics:</p>
+      <p class="card-subtitle">Enter your exact name used during exams to view your dossier, highest score, and performance analytics:</p>
       <form id="profileSearchForm" class="input-group row">
-        <input type="text" id="profileNameInput" placeholder="Enter Student Name..." required />
+        <input type="text" id="profileNameInput" placeholder="Enter your full name..." required />
         <button type="submit" class="btn">View Profile</button>
       </form>
     </section>
@@ -47,7 +47,7 @@
 
       <div class="grid-2">
         <section class="card">
-          <div class="card-title" style="color: var(--emerald);">🌟 Strong Topics</div>
+          <div class="card-title" style="color: var(--emerald);">🌟 Aggregated Strong Topics</div>
           <div id="profStrongList"></div>
         </section>
         <section class="card">
@@ -57,7 +57,7 @@
       </div>
 
       <section class="card">
-        <div class="card-title">📜 Exam History</div>
+        <div class="card-title">📜 Exam History & Submissions</div>
         <div class="table-wrap">
           <table>
             <thead>
@@ -78,17 +78,30 @@
   </main>
 
   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Auto-search if ?name= is passed in URL
+      const params = new URLSearchParams(window.location.search);
+      const prefill = params.get('name');
+      if (prefill) {
+        document.getElementById('profileNameInput').value = prefill;
+        fetchProfile(prefill);
+      }
+    });
+
     document.getElementById('profileSearchForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('profileNameInput').value.trim();
       if (!name) return;
+      fetchProfile(name);
+    });
 
+    async function fetchProfile(name) {
       const container = document.getElementById('profileContainer');
       try {
         const res = await fetch(`/api/student/profile?name=${encodeURIComponent(name)}`);
         const data = await res.json();
         if (!data.success || !data.profile) {
-          alert(data.error || 'Profile not found.');
+          alert(data.error || 'Profile not found. Make sure you entered your exact name.');
           container.style.display = 'none';
           return;
         }
@@ -101,12 +114,12 @@
         document.getElementById('profAvgScore').textContent = `${p.average_score}%`;
 
         document.getElementById('profStrongList').innerHTML = p.strong_topics.length === 0 
-          ? '<p style="font-size:0.85rem; color:var(--text-muted);">No strong topics recorded yet.</p>'
-          : p.strong_topics.map(t => `<div style="padding:8px; background:rgba(16,185,129,0.1); border-radius:8px; margin-bottom:6px; font-size:0.88rem;"><strong>${t.chapter}</strong> - ${t.topic} (${t.accuracy}%)</div>`).join('');
+          ? '<p style="font-size:0.85rem; color:var(--text-muted);">No strong topics recorded yet (70%+ accuracy).</p>'
+          : p.strong_topics.map(t => `<div style="padding:8px; background:rgba(16,185,129,0.1); border-radius:8px; margin-bottom:6px; font-size:0.88rem;"><strong>${escapeHtml(t.chapter)}</strong> - ${escapeHtml(t.topic)} (${t.accuracy}%)</div>`).join('');
 
         document.getElementById('profWeakList').innerHTML = p.weak_topics.length === 0 
           ? '<p style="font-size:0.85rem; color:var(--emerald);">Great job! No weak topics found.</p>'
-          : p.weak_topics.map(t => `<div style="padding:8px; background:rgba(245,158,11,0.1); border-radius:8px; margin-bottom:6px; font-size:0.88rem;"><strong>${t.chapter}</strong> - ${t.topic} (${t.accuracy}%)</div>`).join('');
+          : p.weak_topics.map(t => `<div style="padding:8px; background:rgba(245,158,11,0.1); border-radius:8px; margin-bottom:6px; font-size:0.88rem;"><strong>${escapeHtml(t.chapter)}</strong> - ${escapeHtml(t.topic)} (${t.accuracy}%)</div>`).join('');
 
         document.getElementById('profHistoryTable').innerHTML = p.exam_history.map(h => {
           const mins = Math.floor(h.total_time_sec / 60);
@@ -125,7 +138,7 @@
       } catch (err) {
         alert('Failed to fetch student profile.');
       }
-    });
+    }
 
     function escapeHtml(str) {
       return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -133,4 +146,3 @@
   </script>
 </body>
 </html>
-

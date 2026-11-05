@@ -18,7 +18,7 @@ run_worker_first = true
 [[d1_databases]]
 binding = "DB"
 database_name = "exam_db"
-database_id = "PASTE_YOUR_D1_DATABASE_ID_HERE" # <-- Keep your existing Database ID here!
+database_id = "1a38594a-fd52-48a9-a00d-3e75103ba5c4" # <-- Keep your existing Database ID here!
 
 [vars]
 JWT_SECRET = "super-secret-key-change-this-in-production-987654321"

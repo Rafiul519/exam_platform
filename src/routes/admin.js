@@ -1,6 +1,6 @@
 // ============================================================================
 // FILE: src/routes/admin.js
-// PURPOSE: Admin Authentication, Question Import, Deletion & Live Exam Management
+// PURPOSE: Admin Authentication, Question Import, nDeletion & Live Exam Management
 // ============================================================================
 
 import { Hono } from 'hono';

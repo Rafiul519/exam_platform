@@ -2,7 +2,7 @@
 # Cloudflare Worker Configuration
 # ============================================================================
 
-# Name of your Cloudflare Worker project
+# Name of your Cloudflare Worker project ok
 name = "exam-platform"
 
 # The main entry file for our backend API

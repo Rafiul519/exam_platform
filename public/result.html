@@ -1,1 +1,198 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test Result & Topic Analysis</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <!-- TOPBAR (HIDDEN WHEN PRINTING/DOWNLOADING PDF) -->
+  <header class="topbar no-print">
+    <a href="/" class="brand">
+      <span class="brand-dot"></span>
+      <span>EXAM PORTAL</span>
+    </a>
+    <div class="nav-links">
+      <button type="button" id="downloadPdfBtn" class="btn btn-emerald" style="padding: 8px 14px; font-size: 0.84rem;">
+        📄 Download Paper (PDF)
+      </button>
+      <a href="/" class="btn btn-outline" style="padding: 8px 12px; font-size: 0.84rem;">
+        🏠 Home Page
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- 2-MINUTE QUARANTINE WAIT SCREEN (Shown if student opens before 120s is up) -->
+    <section class="card" id="lockedResultBox" style="display: none; text-align: center; padding: 30px 18px;">
+      <div style="font-size: 2.3rem; margin-bottom: 8px;">⏳</div>
+      <div class="card-title" style="justify-content: center;">Analyzing Your Paper...</div>
+      <p class="card-subtitle">
+        Please wait for the 2-minute result processing countdown to complete.
+      </p>
+      <div id="lockedCountdownTimer" style="font-size: 2.2rem; font-weight: 800; color: #38bdf8; margin: 14px 0;">
+        02:00
+      </div>
+      <a href="/" class="btn btn-outline">🏠 Back to Home Page</a>
+    </section>
+
+    <!-- MAIN RESULT REPORT (Visible once unlocked) -->
+    <div id="resultContentWrapper" style="display: none;">
+
+      <!-- 1. STUDENT HEADER + MOTIVATIONAL BANNER -->
+      <section class="card">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <span class="badge badge-live" id="resExamName">Live Exam</span>
+            <h1 id="resStudentName" style="font-size: 1.45rem; font-weight: 800; margin-top: 6px;">Student Name</h1>
+            <p id="resSubmittedDate" style="font-size: 0.82rem; color: var(--text-muted);"></p>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase;">Overall Score</div>
+            <div id="resScorePercent" style="font-size: 2rem; font-weight: 900; color: #38bdf8;">0%</div>
+          </div>
+        </div>
+
+        <!-- Motivational Sentence Box (Populated from HTML template below) -->
+        <div style="margin-top: 16px; padding: 14px; border-radius: 12px; background: rgba(59, 130, 246, 0.12); border-left: 4px solid var(--primary);">
+          <div style="font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; color: #60a5fa; font-weight: 700;">
+            💡 Performance Motivation
+          </div>
+          <p id="motivationalText" style="font-size: 0.96rem; font-weight: 600; margin-top: 4px; color: #f8fafc;"></p>
+        </div>
+      </section>
+
+      <!-- 2. CORE SCORE & TIME METRICS GRID -->
+      <section class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-num" id="statSelected" style="color: #38bdf8;">0</div>
+          <div class="stat-label">Total Selected</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statSkipped" style="color: var(--amber);">0</div>
+          <div class="stat-label">Total Not Selected (Skipped)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statRight" style="color: var(--emerald);">0</div>
+          <div class="stat-label">Right Answers (✓)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statWrong" style="color: var(--rose);">0</div>
+          <div class="stat-label">Wrong Answers (✗)</div>
+        </div>
+      </section>
+
+      <!-- 3. TIME ANALYSIS BAR (⌚) -->
+      <section class="card">
+        <div class="card-title">⌚ Time & Speed Analysis</div>
+        <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 10px; margin-bottom: 0;">
+          <div class="stat-box">
+            <div class="stat-num" id="statTotalTime" style="font-size: 1.2rem;">0m 0s</div>
+            <div class="stat-label">Total Time Taken</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="statAvgTime" style="font-size: 1.2rem; color: #38bdf8;">0s</div>
+            <div class="stat-label">Avg Time Per Answer</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="statAccuracy" style="font-size: 1.2rem; color: var(--emerald);">0%</div>
+            <div class="stat-label">Attempt Accuracy</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. STRENGTHS vs NEEDS MORE FOCUS (CHAPTER / TOPIC INTELLIGENCE) -->
+      <div class="grid-2">
+        <!-- You Do Better In This Chapter/Topic -->
+        <section class="card">
+          <div class="card-title" style="color: var(--emerald);">
+            <span>🌟 You Do Better In (Strong Chapters/Topics)</span>
+          </div>
+          <p class="card-subtitle">Topics where your accuracy is 70% or higher:</p>
+          <div id="strongTopicsList"></div>
+        </section>
+
+        <!-- Needs More Focus -->
+        <section class="card">
+          <div class="card-title" style="color: var(--amber);">
+            <span>🎯 Needs More Focus (Weak Chapters/Topics)</span>
+          </div>
+          <p class="card-subtitle">Chapters & topics where you lost marks or skipped questions:</p>
+          <div id="weakTopicsList"></div>
+        </section>
+      </div>
+
+      <!-- 5. DETAILED TOPIC-WISE RIGHT / WRONG / TIME BREAKDOWN TABLE -->
+      <section class="card">
+        <div class="card-title">📊 Topic & Chapter-Wise Detailed Analysis</div>
+        <p class="card-subtitle">Complete breakdown of Right, Wrong, Skipped, and Average Time (⌚) by topic:</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Chapter & Topic</th>
+                <th>Total</th>
+                <th style="color: var(--emerald);">Right</th>
+                <th style="color: var(--rose);">Wrong</th>
+                <th style="color: var(--amber);">Skipped</th>
+                <th>Avg Time ⌚</th>
+                <th>Accuracy</th>
+              </tr>
+            </thead>
+            <tbody id="topicBreakdownTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 6. ADMIN-ONLY ANTI-CHEAT TELEMETRY BOX (Hidden for normal students) -->
+      <section class="card no-print" id="adminAntiCheatBox" style="display: none; border-color: rgba(239, 68, 68, 0.4);">
+        <div class="card-title" style="color: var(--rose);">
+          <span>🛡️ Admin Telemetry & Anti-Cheat Report</span>
+          <span class="badge badge-wait" id="cheatScoreBadge">Risk: 0/100</span>
+        </div>
+        <div id="cheatFlagsList" style="font-size: 0.88rem; color: var(--text-muted); margin-top: 8px;"></div>
+      </section>
+
+      <!-- 7. COMPLETE QUESTION PAPER WITH STUDENT SELECTION, TIME & EXPLANATION -->
+      <section class="card">
+        <div class="card-title">
+          <span>📝 Complete Answer Sheet & Solutions</span>
+          <button type="button" onclick="window.print()" class="btn btn-outline no-print" style="padding: 6px 12px; font-size: 0.8rem;">
+            🖨️ Print / Save PDF
+          </button>
+        </div>
+        <p class="card-subtitle">
+          Review every question, the option you selected, time taken (⌚), correct answer, and explanation:
+        </p>
+        <div id="paperReviewContainer"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==========================================================================
+       MOTIVATIONAL SENTENCES STORED DIRECTLY IN HTML FILE (BY SCORE BRACKET)
+       ========================================================================== -->
+  <template id="motivationalQuotesTemplate">
+    <div data-min="90" data-max="100">
+      🏆 Outstanding mastery! Your concepts and speed are rock-solid. Keep revising your strong chapters to stay at the very top!
+    </div>
+    <div data-min="70" data-max="89.99">
+      🌟 Great performance! You have a strong grasp of most chapters. Polish the few topics in your "Needs More Focus" list to cross 90% next time!
+    </div>
+    <div data-min="45" data-max="69.99">
+      💪 Good effort! You have built a solid foundation, but turning your skipped and wrong topics into strengths will dramatically boost your rank.
+    </div>
+    <div data-min="0" data-max="44.99">
+      🔥 Every champion starts by analyzing mistakes! Read the explanations below carefully, focus on one weak chapter at a time, and come back stronger in the next test!
+    </div>
+  </template>
+
+  <script src="/js/result.js"></script>
+</body>
+  </html>
+  

@@ -1,12 +1,12 @@
 // ============================================================================
-// FILE: src/routes/exam.jsb
-// PURPOSE: Live exam status, session creation, sanitized question delivery & grading
+// FILE: src/routes/exam.js
+// PURPOSE: Live exam status, session creation, shuffled question delivery & grading
 // ============================================================================
 
 import { Hono } from 'hono';
 import { signToken, requireStudentSession } from '../middleware/auth.js';
 import { generateSecureId, watermarkQuestionText } from '../utils/hash.js';
-import { evaluateSubmission } from '../utils/scoring.js';
+import { evaluateSubmission, shuffleQuestionsForSession } from '../utils/scoring.js';
 import { rateLimiter } from '../middleware/rateLimit.js';
 
 const examRoutes = new Hono();
@@ -87,7 +87,10 @@ examRoutes.get('/questions', requireStudentSession, async (c) => {
     `SELECT id, question_text, option_a, option_b, option_c, option_d, chapter, topic, difficulty FROM questions WHERE id IN (${placeholders})`
   ).bind(...questionIds).all();
 
-  const sanitized = (results || []).map((q, idx) => ({
+  // Shuffle questions uniquely for this student's session across all selected chapters
+  const shuffledResults = shuffleQuestionsForSession(results || [], session.sessionId);
+
+  const sanitized = shuffledResults.map((q, idx) => ({
     question_number: idx + 1,
     id: q.id,
     question_text: watermarkQuestionText(q.question_text, session.sessionId),
@@ -120,7 +123,7 @@ examRoutes.post('/submit', requireStudentSession, rateLimiter('exam-submit', 5, 
 
     const serverNow = Math.floor(Date.now() / 1000);
     const serverElapsedSec = Math.max(1, serverNow - session.startedAt);
-    const evaluation = evaluateSubmission(dbQuestions || [], responses, serverElapsedSec);
+    const evaluation = evaluateSubmission(dbQuestions || [], responses, serverElapsedSec, session.sessionId);
 
     await c.env.DB.prepare(
       `INSERT INTO submissions (
@@ -146,6 +149,7 @@ examRoutes.post('/submit', requireStudentSession, rateLimiter('exam-submit', 5, 
       student_name: session.studentName,
       submitted_at: serverNow,
       unlock_at: serverNow + 120,
+      server_time: serverNow,
     });
   } catch (err) {
     return c.json({ success: false, error: 'Submission failed: ' + err.message }, 500);
@@ -153,4 +157,3 @@ examRoutes.post('/submit', requireStudentSession, rateLimiter('exam-submit', 5, 
 });
 
 export default examRoutes;
-               

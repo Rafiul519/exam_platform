@@ -1,1 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Profile & Analytics</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a href="/" class="brand"><span class="brand-dot"></span><span>STUDENT PROFILE</span></a>
+    <div class="nav-links">
+      <a href="/" class="btn btn-outline" style="padding: 8px 12px; font-size: 0.82rem;">🏠 Home</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card" style="max-width: 500px; margin: 20px auto;">
+      <div class="card-title">🔍 Lookup Student Profile</div>
+      <p class="card-subtitle">Enter your name to view your exam history, highest score, and performance analytics:</p>
+      <form id="profileSearchForm" class="input-group row">
+        <input type="text" id="profileNameInput" placeholder="Enter Student Name..." required />
+        <button type="submit" class="btn">View Profile</button>
+      </form>
+    </section>
+
+    <div id="profileContainer" style="display: none;">
+      <section class="card">
+        <h1 id="profStudentName" style="font-size: 1.5rem; font-weight: 800; color: #38bdf8;"></h1>
+        <p style="font-size: 0.84rem; color: var(--text-muted);">Connected Student Examination Dossier</p>
+        
+        <div class="stats-grid" style="margin-top: 16px;">
+          <div class="stat-box">
+            <div class="stat-num" id="profTotalExams">0</div>
+            <div class="stat-label">Exams Attempted</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="profHighestScore" style="color: var(--emerald);">0%</div>
+            <div class="stat-label">Highest Score</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="profAvgScore" style="color: #38bdf8;">0%</div>
+            <div class="stat-label">Average Score</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid-2">
+        <section class="card">
+          <div class="card-title" style="color: var(--emerald);">🌟 Strong Topics</div>
+          <div id="profStrongList"></div>
+        </section>
+        <section class="card">
+          <div class="card-title" style="color: var(--amber);">🎯 Topics Needing Focus</div>
+          <div id="profWeakList"></div>
+        </section>
+      </div>
+
+      <section class="card">
+        <div class="card-title">📜 Exam History</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Exam Name</th>
+                <th>Date</th>
+                <th>Score</th>
+                <th>Right / Wrong</th>
+                <th>Time Taken</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="profHistoryTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById('profileSearchForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('profileNameInput').value.trim();
+      if (!name) return;
+
+      const container = document.getElementById('profileContainer');
+      try {
+        const res = await fetch(`/api/student/profile?name=${encodeURIComponent(name)}`);
+        const data = await res.json();
+        if (!data.success || !data.profile) {
+          alert(data.error || 'Profile not found.');
+          container.style.display = 'none';
+          return;
+        }
+
+        const p = data.profile;
+        container.style.display = 'block';
+        document.getElementById('profStudentName').textContent = p.student_name;
+        document.getElementById('profTotalExams').textContent = p.total_exams_attempted;
+        document.getElementById('profHighestScore').textContent = `${p.highest_score}%`;
+        document.getElementById('profAvgScore').textContent = `${p.average_score}%`;
+
+        document.getElementById('profStrongList').innerHTML = p.strong_topics.length === 0 
+          ? '<p style="font-size:0.85rem; color:var(--text-muted);">No strong topics recorded yet.</p>'
+          : p.strong_topics.map(t => `<div style="padding:8px; background:rgba(16,185,129,0.1); border-radius:8px; margin-bottom:6px; font-size:0.88rem;"><strong>${t.chapter}</strong> - ${t.topic} (${t.accuracy}%)</div>`).join('');
+
+        document.getElementById('profWeakList').innerHTML = p.weak_topics.length === 0 
+          ? '<p style="font-size:0.85rem; color:var(--emerald);">Great job! No weak topics found.</p>'
+          : p.weak_topics.map(t => `<div style="padding:8px; background:rgba(245,158,11,0.1); border-radius:8px; margin-bottom:6px; font-size:0.88rem;"><strong>${t.chapter}</strong> - ${t.topic} (${t.accuracy}%)</div>`).join('');
+
+        document.getElementById('profHistoryTable').innerHTML = p.exam_history.map(h => {
+          const mins = Math.floor(h.total_time_sec / 60);
+          const secs = h.total_time_sec % 60;
+          return `
+            <tr>
+              <td><strong>${escapeHtml(h.exam_name)}</strong></td>
+              <td>${new Date(h.submitted_at * 1000).toLocaleDateString()}</td>
+              <td><strong style="color:#38bdf8;">${h.score_percentage}%</strong></td>
+              <td><span style="color:var(--emerald);">${h.total_right}✓</span> / <span style="color:var(--rose);">${h.total_wrong}✗</span></td>
+              <td>${mins}m ${secs}s</td>
+              <td><a href="/result.html?id=${encodeURIComponent(h.submission_id)}" class="btn" style="padding:4px 10px; font-size:0.75rem;">View</a></td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        alert('Failed to fetch student profile.');
+      }
+    });
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
 

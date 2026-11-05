@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,29 +7,21 @@
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-
-  <!-- TOPBAR -->
   <header class="topbar">
     <a href="/" class="brand">
       <span class="brand-dot"></span>
       <span>ADMIN CONSOLE</span>
     </a>
     <div class="nav-links">
-      <a href="/" class="btn btn-outline" style="padding: 8px 12px; font-size: 0.82rem;">
-        🏠 Student Home
-      </a>
-      <button type="button" id="logoutAdminBtn" class="btn btn-rose" style="padding: 8px 12px; font-size: 0.82rem; display: none;">
-        Logout
-      </button>
+      <a href="/" class="btn btn-outline" style="padding: 8px 12px; font-size: 0.82rem;">🏠 Student Home</a>
+      <button type="button" id="logoutAdminBtn" class="btn btn-rose" style="padding: 8px 12px; font-size: 0.82rem; display: none;">Logout</button>
     </div>
   </header>
 
   <main class="container">
-
-    <!-- 1. ADMIN LOGIN CARD -->
     <section class="card" id="adminLoginCard" style="max-width: 440px; margin: 30px auto;">
       <div class="card-title">🔐 Admin Authentication</div>
-      <p class="card-subtitle">Enter your Admin Password to manage question bundles, live exams, and student results.</p>
+      <p class="card-subtitle">Enter your Admin Password to manage questions, exams, and results.</p>
       <form id="adminLoginForm" class="input-group">
         <input type="password" id="adminPasswordInput" placeholder="Enter Admin Password..." required />
         <button type="submit" class="btn btn-block">Login to Admin Dashboard</button>
@@ -38,90 +29,56 @@
       <p id="loginErrorMsg" style="color: var(--rose); font-size: 0.85rem; display: none;"></p>
     </section>
 
-    <!-- 2. MAIN ADMIN DASHBOARD (Visible after Login) -->
     <div id="adminDashboardWrapper" style="display: none;">
-
       <div class="grid-2">
-
-        <!-- CARD A: IMPORT QUESTIONS JSON FILE -->
         <section class="card">
           <div class="card-title">
             <span>📥 1. Import Questions (JSON)</span>
             <span class="badge badge-live">SHA-256 Anti-Duplicate</span>
           </div>
-          <p class="card-subtitle">
-            Upload a `.json` file or paste JSON array below. Questions are automatically bundled by Chapter name and duplicates are blocked!
-          </p>
-
+          <p class="card-subtitle">Upload JSON or paste below. Automatically bundled by Chapter name.</p>
           <div class="input-group">
             <input type="file" id="jsonFileInput" accept=".json,application/json" />
-            <textarea
-              id="jsonTextarea"
-              rows="6"
-              placeholder='[{"question":"...","option_a":"...","option_b":"...","option_c":"...","option_d":"...","answer":"B","explanation":"...","source":"NCERT","chapter":"Cell: The Unit of Life","topic":"Organelles","difficulty":"Medium"}]'
-            ></textarea>
-            <button type="button" id="importJsonBtn" class="btn btn-emerald btn-block">
-              ⚡ Upload & Bundle Questions
-            </button>
+            <textarea id="jsonTextarea" rows="6" placeholder='[{"question":"...","option_a":"...","option_b":"...","option_c":"...","option_d":"...","answer":"B","chapter":"Cell"}]'></textarea>
+            <button type="button" id="importJsonBtn" class="btn btn-emerald btn-block">⚡ Upload & Bundle Questions</button>
           </div>
           <div id="importStatusBox" style="font-size: 0.86rem; margin-top: 8px;"></div>
         </section>
 
-        <!-- CARD B: SCHEDULE / HOLD LIVE EXAM -->
         <section class="card">
-          <div class="card-title">
-            <span>📅 2. Hold Live Examination</span>
-          </div>
-          <p class="card-subtitle">
-            Select exam name, start date/time (for countdown), and check the Chapter Bundles to include:
-          </p>
-
+          <div class="card-title"><span>📅 2. Hold Live Examination</span></div>
+          <p class="card-subtitle">Schedule exam name, date/time, and choose chapter bundles:</p>
           <form id="createExamForm" class="input-group">
             <label style="font-size: 0.82rem; color: var(--text-muted);">Exam Name:</label>
-            <input type="text" id="examNameInput" placeholder="e.g., NEET Weekly Mock Test #4" required />
-
-            <label style="font-size: 0.82rem; color: var(--text-muted);">Select Exam Start Date & Time:</label>
+            <input type="text" id="examNameInput" placeholder="e.g., NEET Full Mock #1" required />
+            <label style="font-size: 0.82rem; color: var(--text-muted);">Exam Start Date & Time:</label>
             <input type="datetime-local" id="examDateTimeInput" required />
-
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
-              <label style="font-size: 0.82rem; color: var(--text-muted);">Select Chapter Question Bundles:</label>
-              <button type="button" id="refreshBundlesBtn" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;">
-                ↻ Refresh
-              </button>
+              <label style="font-size: 0.82rem; color: var(--text-muted);">Chapter Question Bundles:</label>
+              <button type="button" id="refreshBundlesBtn" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;">↻ Refresh</button>
             </div>
-
-            <!-- Chapter Checkboxes Container -->
-            <div
-              id="chapterBundlesList"
-              style="max-height: 170px; overflow-y: auto; padding: 10px; border-radius: 10px; background: rgba(15,23,42,0.8); border: 1px solid var(--border-subtle);"
-            ></div>
-
+            <div id="chapterBundlesList" style="max-height: 170px; overflow-y: auto; padding: 10px; border-radius: 10px; background: rgba(15,23,42,0.8); border: 1px solid var(--border-subtle);"></div>
             <div style="display: flex; gap: 10px; margin-top: 8px;">
-              <button type="submit" class="btn btn-emerald btn-block">
-                🚀 Publish Live Exam
-              </button>
-              <button type="button" id="stopExamBtn" class="btn btn-rose">
-                Stop Active Exam
-              </button>
+              <button type="submit" class="btn btn-emerald btn-block">🚀 Publish Live Exam</button>
+              <button type="button" id="stopExamBtn" class="btn btn-rose">Stop Exam</button>
             </div>
           </form>
           <div id="examScheduleStatus" style="font-size: 0.86rem; margin-top: 8px;"></div>
         </section>
-
       </div>
 
-      <!-- CARD C: STUDENT RESULTS & DELETE OPTION -->
+      <!-- CHAPTER DELETION & MANAGEMENT CARD -->
+      <section class="card">
+        <div class="card-title"><span>🗑️ Question & Chapter Management</span></div>
+        <p class="card-subtitle">Delete entire chapters or individual questions safely (historical student submissions remain fully preserved):</p>
+        <div id="chapterManagementList" style="margin-top: 10px;"></div>
+      </section>
+
       <section class="card">
         <div class="card-title">
           <span>🎓 3. Student Submissions & Results</span>
-          <button type="button" id="refreshResultsBtn" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;">
-            ↻ Refresh Results
-          </button>
+          <button type="button" id="refreshResultsBtn" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;">↻ Refresh</button>
         </div>
-        <p class="card-subtitle">
-          Tap any student's result to inspect their full paper and anti-cheat report, or delete individual records:
-        </p>
-
         <div class="table-wrap">
           <table>
             <thead>
@@ -139,11 +96,8 @@
           </table>
         </div>
       </section>
-
     </div>
   </main>
-
   <script src="/js/admin.js"></script>
 </body>
-          </html>
-          
+</html>

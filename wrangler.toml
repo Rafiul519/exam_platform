@@ -7,20 +7,19 @@ main = "src/index.js"
 # Compatibility date ensures modern Cloudflare Worker features are active
 compatibility_date = "2024-10-01"
 
-# Serves our HTML/CSS/JS frontend files from the 'public' folder automatically
+# Serves our HTML/CSS/JS frontend files from the 'public' folder
+# CRITICAL FIX: run_worker_first = true ensures /api/* routes always hit Hono first!
 [assets]
 directory = "./public"
 binding = "ASSETS"
+run_worker_first = true
 
 # Connects our Cloudflare D1 SQLite Database to the backend via 'c.env.DB'
 [[d1_databases]]
 binding = "DB"
 database_name = "exam_db"
-database_id = "1a38594a-fd52-48a9-a00d-3e75103ba5c4" # <-- Replace with your ID from terminal!
+database_id = "PASTE_YOUR_D1_DATABASE_ID_HERE" # <-- Keep your existing Database ID here!
 
-# Environment variables (Secrets for signing tokens and admin login)
-# In production, you can also set these securely via: npx wrangler secret put JWT_SECRET
 [vars]
 JWT_SECRET = "super-secret-key-change-this-in-production-987654321"
 ADMIN_PASSWORD = "admin123secure"
-

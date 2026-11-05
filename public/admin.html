@@ -19,15 +19,19 @@
   </header>
 
   <main class="container">
-    <section class="card" id="adminLoginCard" style="max-width: 440px; margin: 30px auto;">
-      <div class="card-title">🔐 Admin Authentication</div>
-      <p class="card-subtitle">Enter your Admin Password to manage questions, exams, and results.</p>
-      <form id="adminLoginForm" class="input-group">
-        <input type="password" id="adminPasswordInput" placeholder="Enter Admin Password..." required />
-        <button type="submit" class="btn btn-block">Login to Admin Dashboard</button>
-      </form>
-      <p id="loginErrorMsg" style="color: var(--rose); font-size: 0.85rem; display: none;"></p>
-    </section>
+    <!-- 1. ADMIN LOGIN CARD -->
+<section class="card" id="adminLoginCard" style="max-width: 440px; margin: 30px auto;">
+  <div class="card-title">🔐 Admin Authentication</div>
+  <p class="card-subtitle">Enter your Admin Password to manage question bundles, live exams, and student results.</p>
+  
+  <!-- Form ki jagah simple div aur direct onclick lagaya hai taaki click 100% kaam kare -->
+  <div class="input-group">
+    <input type="password" id="adminPasswordInput" placeholder="Enter Admin Password..." />
+    <button type="button" onclick="directAdminLogin()" class="btn btn-block">Login to Admin Dashboard</button>
+  </div>
+  <p id="loginErrorMsg" style="color: var(--rose; font-size: 0.85rem; margin-top: 8px; display: none;"></p>
+</section>
+
 
     <div id="adminDashboardWrapper" style="display: none;">
       <div class="grid-2">

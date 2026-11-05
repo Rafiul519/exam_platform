@@ -1,1 +1,153 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Examination</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <!-- TOPBAR WITH UPWARD STOPWATCH (⌚) AND SUBMIT BUTTON -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <span id="topExamName" style="font-size: 0.98rem;">Live Test</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <!-- Upward Stopwatch (Unlimited Time Analysis Mode) -->
+      <div class="stopwatch-pill" title="Total Time Taken">
+        <span>⌚</span>
+        <span id="upwardTimer">00:00</span>
+      </div>
+
+      <button type="button" id="openSubmitModalBtn" class="btn btn-emerald" style="padding: 8px 14px; font-size: 0.85rem;">
+        Submit Test
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN LIVE EXAM WORKSPACE -->
+  <main class="exam-layout">
+
+    <!-- LEFT / TOP: SINGLE QUESTION CARD -->
+    <section class="card" id="questionWorkspace">
+      <div class="q-meta-bar">
+        <div>
+          <span class="q-number-badge" id="qNumberDisplay">Question 1 of 1</span>
+          <span class="badge badge-closed" id="qChapterBadge" style="margin-left: 6px;">Chapter</span>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">
+          ⌚ Time on this Q: <strong id="qCurrentTimer" style="color: #38bdf8;">0s</strong>
+        </div>
+      </div>
+
+      <!-- Question Text -->
+      <div class="q-text" id="questionText">Loading live questions...</div>
+
+      <!-- Options A, B, C, D -->
+      <div class="options-list" id="optionsContainer"></div>
+
+      <!-- Navigation Action Buttons -->
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--border-subtle); padding-top: 16px;">
+        <button type="button" id="prevBtn" class="btn btn-outline">
+          ← Previous
+        </button>
+
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="clearSelectionBtn" class="btn btn-outline" style="color: #fbbf24;">
+            Clear / Skip
+          </button>
+          <button type="button" id="nextBtn" class="btn">
+            Save & Next →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT / BOTTOM: QUESTION SHEET PALETTE (1, 2, 3, 4...) -->
+    <aside class="card">
+      <div class="card-title">
+        <span>📋 Question Sheet</span>
+        <span id="studentNameBadge" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;"></span>
+      </div>
+
+      <!-- Color Code Legend -->
+      <div class="legend-row">
+        <span><i class="legend-dot" style="background: var(--emerald);"></i>Selected (<strong id="countSelected">0</strong>)</span>
+        <span><i class="legend-dot" style="background: var(--amber);"></i>Skipped (<strong id="countSkipped">0</strong>)</span>
+        <span><i class="legend-dot" style="background: var(--slate);"></i>Unvisited (<strong id="countUnvisited">0</strong>)</span>
+      </div>
+
+      <!-- Numbered Buttons Grid (1, 2, 3, 4...) -->
+      <div class="palette-grid" id="paletteGrid"></div>
+    </aside>
+
+  </main>
+
+  <!-- MODAL 1: SUBMIT CONFIRMATION POPUP -->
+  <div class="modal-backdrop" id="confirmSubmitModal">
+    <div class="modal-card">
+      <div class="card-title">⚠️ Confirm Exam Submission</div>
+      <p class="card-subtitle">
+        Are you sure you want to submit your test paper to the server?
+      </p>
+
+      <div class="stats-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 18px;">
+        <div class="stat-box">
+          <div class="stat-num" id="modalSelectedCount" style="color: var(--emerald);">0</div>
+          <div class="stat-label">Questions Selected</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="modalSkippedCount" style="color: var(--amber);">0</div>
+          <div class="stat-label">Questions Skipped</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button type="button" id="cancelSubmitBtn" class="btn btn-outline btn-block">
+          Go Back
+        </button>
+        <button type="button" id="confirmFinalSubmitBtn" class="btn btn-emerald btn-block">
+          Yes, Submit Now
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: POST-SUBMIT 2-MINUTE RESULT COUNTDOWN -->
+  <div class="modal-backdrop" id="postSubmitModal">
+    <div class="modal-card" style="text-align: center;">
+      <div style="font-size: 2.2rem; margin-bottom: 6px;">✅</div>
+      <div class="card-title" style="justify-content: center;">Test Submitted Successfully!</div>
+      <p class="card-subtitle" style="margin-bottom: 12px;">
+        Your answers and question timings are being analyzed on the server.
+      </p>
+
+      <div style="background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; margin-bottom: 14px;">
+        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">
+          Result Unlocks In
+        </div>
+        <div id="twoMinCountdown" style="font-size: 2.1rem; font-weight: 800; color: #38bdf8; margin: 6px 0;">
+          02:00
+        </div>
+        <p style="font-size: 0.84rem; color: #fbbf24; line-height: 1.4;">
+          💡 You can wait here for automatic redirection, or check your result anytime on the <strong>Home Page</strong> using your name (<strong id="submittedStudentName"></strong>) once 2 minutes pass!
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <a href="/" class="btn btn-outline btn-block">🏠 Home Page</a>
+        <button type="button" id="viewResultNowBtn" class="btn btn-emerald btn-block" disabled>
+          Waiting (2m)...
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/test.js"></script>
+</body>
+          </html>
+          

@@ -1,6 +1,6 @@
 
 // ============================================================================
-// FILE: src/routes/student.js
+// FILE: src/routes/student.jsh
 // PURPOSE: Student Profile & Aggregated Analytics API
 // ============================================================================
 

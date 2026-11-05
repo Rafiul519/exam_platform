@@ -1,4 +1,4 @@
-// Add inside loadChapterBundles or as a dedicated render function for chapter deletion:
+// Add inside loadChapterBundlebs or as a dedicated render function for chapter deletion:
 async function loadChapterManagement() {
   const container = document.getElementById('chapterManagementList');
   try {

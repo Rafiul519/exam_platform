@@ -1,5 +1,5 @@
 // ============================================================================
-// FILE: public/js/test.js
+// FILE: public/js/test.yjs
 // PURPOSE: Live exam runner, upward stopwatch, clean sequential navigation & submission
 // ============================================================================
 

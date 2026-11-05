@@ -1,1 +1,364 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backend API Tester (Mobile)</title>
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { margin: 0; padding: 14px; background: #0f172a; color: #f8fafc; }
+    h2 { margin-top: 0; font-size: 1.25rem; color: #38bdf8; }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .step-title { font-weight: 700; margin-bottom: 8px; color: #e2e8f0; font-size: 0.95rem; }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-bottom: 6px;
+    }
+    button.green { background: #059669; }
+    button.amber { background: #d97706; }
+    button.red { background: #dc2626; }
+    pre {
+      background: #020617;
+      color: #4ade80;
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.8rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 300px;
+      border: 1px solid #1e293b;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+      background: #334155;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>⚡ Backend API Step-by-Step Tester</h2>
+  <p style="font-size:0.85rem; color:#94a3b8; margin-top:-6px;">
+    Tap each button in order (1 to 9) to verify all backend routes, duplicate restriction, grading, and security.
+  </p>
+
+  <!-- LIVE OUTPUT LOG -->
+  <div class="card">
+    <div class="step-title">📡 Server Response Output:</div>
+    <pre id="output">Tap "1. Test Health Check" below to begin...</pre>
+  </div>
+
+  <!-- STEP 1: HEALTH -->
+  <div class="card">
+    <div class="step-title">1. Check Backend Health</div>
+    <button onclick="testHealth()">1. Test /api/health</button>
+  </div>
+
+  <!-- STEP 2: ADMIN LOGIN -->
+  <div class="card">
+    <div class="step-title">2. Admin Auth Login (Gets Admin JWT)</div>
+    <input type="text" id="adminPass" value="admin123secure" placeholder="Admin Password" />
+    <button onclick="testAdminLogin()">2. Login as Admin</button>
+  </div>
+
+  <!-- STEP 3: IMPORT QUESTIONS + DUPLICATE RESTRICTION TEST -->
+  <div class="card">
+    <div class="step-title">3. Import Sample Questions (Tests Duplicate Blocker)</div>
+    <span class="badge">Includes 4 questions (1 is an intentional duplicate!)</span>
+    <textarea id="sampleJson" rows="6">[
+  {
+    "question": "Which organelle is known as the powerhouse of the cell?",
+    "option_a": "Ribosome",
+    "option_b": "Mitochondria",
+    "option_c": "Golgi apparatus",
+    "option_d": "Nucleus",
+    "answer": "B",
+    "explanation": "Mitochondria generate ATP through cellular respiration.",
+    "source": "NCERT Class 11",
+    "chapter": "Cell: The Unit of Life",
+    "topic": "Eukaryotic Cell Organelles",
+    "difficulty": "Easy"
+  },
+  {
+    "question": "which organelle is known as the powerhouse of the cell?? ",
+    "option_a": "Ribosome",
+    "option_b": "Mitochondria",
+    "option_c": "Golgi apparatus",
+    "option_d": "Nucleus",
+    "answer": "B",
+    "explanation": "Duplicate test with lowercase & extra punctuation!",
+    "source": "NCERT",
+    "chapter": "Cell: The Unit of Life",
+    "topic": "Eukaryotic Cell Organelles",
+    "difficulty": "Easy"
+  },
+  {
+    "question": "What is the dimensional formula of Planck's constant?",
+    "option_a": "[ML^2T^-1]",
+    "option_b": "[ML^2T^-2]",
+    "option_c": "[MLT^-1]",
+    "option_d": "[M^0L^2T^-1]",
+    "answer": "A",
+    "explanation": "E = h*f, so h = E/f = [ML^2T^-2] / [T^-1] = [ML^2T^-1].",
+    "source": "PYQ",
+    "chapter": "Units and Measurements",
+    "topic": "Dimensional Analysis",
+    "difficulty": "Medium"
+  },
+  {
+    "question": "Which of the following shows highest oxidation state among 3d series?",
+    "option_a": "Fe",
+    "option_b": "Cr",
+    "option_c": "Mn",
+    "option_d": "V",
+    "answer": "C",
+    "explanation": "Manganese (Mn) exhibits +7 oxidation state in KMnO4.",
+    "source": "NCERT Class 12",
+    "chapter": "d and f Block Elements",
+    "topic": "Oxidation States",
+    "difficulty": "Hard"
+  }
+]</textarea>
+    <button class="green" onclick="testImportQuestions()">3. Import JSON & Check Duplicate Blocker</button>
+    <button onclick="testGetBundles()">3B. View Auto-Created Chapter Bundles</button>
+  </div>
+
+  <!-- STEP 4: CREATE LIVE EXAM -->
+  <div class="card">
+    <div class="step-title">4. Schedule Live Exam (Admin)</div>
+    <input type="text" id="examName" value="Full Mock Test #1" />
+    <button class="amber" onclick="testCreateExam()">4. Launch Live Exam (Starts Immediately)</button>
+  </div>
+
+  <!-- STEP 5: STUDENT CHECKS STATUS & STARTS EXAM -->
+  <div class="card">
+    <div class="step-title">5. Student Checks Live Exam & Enters Name</div>
+    <button onclick="testExamStatus()">5A. Check Live Exam Status (/api/exam/status)</button>
+    <input type="text" id="studentName" value="Aynal Haque" placeholder="Enter Student Name" />
+    <button class="green" onclick="testStartExam()">5B. Enter Name & Start Test (/api/exam/start)</button>
+  </div>
+
+  <!-- STEP 6: FETCH QUESTIONS & VERIFY ANSWERS ARE HIDDEN -->
+  <div class="card">
+    <div class="step-title">6. Load Live Test Questions (Zero-Trust Check)</div>
+    <span class="badge">Check output: 'correct_option' & 'explanation' MUST be missing!</span>
+    <button onclick="testFetchQuestions()">6. Fetch Questions (/api/exam/questions)</button>
+  </div>
+
+  <!-- STEP 7: SUBMIT EXAM ANSWERS -->
+  <div class="card">
+    <div class="step-title">7. Submit Test Answers + Time Taken (⌚)</div>
+    <span class="badge">Simulates 2 Right, 1 Wrong with timing data</span>
+    <button class="green" onclick="testSubmitExam()">7. Submit Answers (/api/exam/submit)</button>
+  </div>
+
+  <!-- STEP 8: TEST 2-MINUTE LOCK vs ADMIN BYPASS -->
+  <div class="card">
+    <div class="step-title">8. Test Result Page & 2-Minute Quarantine Lock</div>
+    <button onclick="testSearchResult()">8A. Search Result by Name (/api/result/search)</button>
+    <button class="amber" onclick="testGetResultStudent()">8B. View Result as Student (Tests 2-Min Lock)</button>
+    <button class="green" onclick="testGetResultAdmin()">8C. View Result as Admin (Instant Bypass + Anti-Cheat)</button>
+  </div>
+
+  <!-- STEP 9: ADMIN RESULT LIST & DELETE -->
+  <div class="card">
+    <div class="step-title">9. Admin Results List & Delete Option</div>
+    <button onclick="testAdminResultsList()">9A. Get All Student Results (/api/admin/results)</button>
+    <button class="red" onclick="testDeleteResult()">9B. Delete This Student Result</button>
+  </div>
+
+  <script>
+    let adminToken = '';
+    let studentToken = '';
+    let loadedQuestions = [];
+    let currentSubmissionId = '';
+
+    function log(title, data) {
+      const el = document.getElementById('output');
+      el.textContent = `=== ${title} ===\n` + JSON.stringify(data, null, 2);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function testHealth() {
+      const res = await fetch('/api/health');
+      log('1. Health Check', await res.json());
+    }
+
+    async function testAdminLogin() {
+      const password = document.getElementById('adminPass').value;
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      const data = await res.json();
+      if (data.token) adminToken = data.token;
+      log('2. Admin Login', data);
+    }
+
+    async function testImportQuestions() {
+      const raw = JSON.parse(document.getElementById('sampleJson').value);
+      const res = await fetch('/api/admin/import-questions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: JSON.stringify({ questions: raw })
+      });
+      log('3. Import Questions (Notice duplicateSkippedCount!)', await res.json());
+    }
+
+    async function testGetBundles() {
+      const res = await fetch('/api/admin/bundles', {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      log('3B. Auto Chapter Bundles', await res.json());
+    }
+
+    async function testCreateExam() {
+      const exam_name = document.getElementById('examName').value;
+      // Schedule 5 seconds in the past so we can enter immediately during test
+      const scheduled_at = Math.floor(Date.now() / 1000) - 5;
+      const chapters = [
+        'Cell: The Unit of Life',
+        'Units and Measurements',
+        'd and f Block Elements'
+      ];
+      const res = await fetch('/api/admin/create-exam', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: JSON.stringify({ exam_name, scheduled_at, chapters })
+      });
+      log('4. Schedule Live Exam', await res.json());
+    }
+
+    async function testExamStatus() {
+      const res = await fetch('/api/exam/status');
+      log('5A. Live Exam Status', await res.json());
+    }
+
+    async function testStartExam() {
+      const student_name = document.getElementById('studentName').value;
+      const res = await fetch('/api/exam/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_name })
+      });
+      const data = await res.json();
+      if (data.session_token) {
+        studentToken = data.session_token;
+        currentSubmissionId = data.submission_id;
+      }
+      log('5B. Start Exam Session', data);
+    }
+
+    async function testFetchQuestions() {
+      const res = await fetch('/api/exam/questions', {
+        headers: { 'Authorization': `Bearer ${studentToken}` }
+      });
+      const data = await res.json();
+      if (data.questions) loadedQuestions = data.questions;
+      log('6. Sanitized Questions (Zero answers leaked!)', data);
+    }
+
+    async function testSubmitExam() {
+      if (!loadedQuestions.length) {
+        alert('Tap Button 6 to fetch questions first!');
+        return;
+      }
+      // Simulate answering Q1 Right (B), Q2 Right (A), Q3 Wrong (A instead of C)
+      const simulatedAnswers = ['B', 'A', 'A'];
+      const simulatedTimes = [14, 28, 19];
+
+      const responses = loadedQuestions.map((q, i) => ({
+        question_id: q.id,
+        selected_option: simulatedAnswers[i] || 'A',
+        time_spent_sec: simulatedTimes[i] || 15,
+        option_changes: 1,
+        tab_switches: 0
+      }));
+
+      const res = await fetch('/api/exam/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${studentToken}`
+        },
+        body: JSON.stringify({ responses })
+      });
+      const data = await res.json();
+      if (data.submission_id) currentSubmissionId = data.submission_id;
+      log('7. Submit Exam (Starts 2-Min Result Timer)', data);
+    }
+
+    async function testSearchResult() {
+      const name = encodeURIComponent(document.getElementById('studentName').value);
+      const res = await fetch(`/api/result/search?name=${name}`);
+      log('8A. Search Result by Name', await res.json());
+    }
+
+    async function testGetResultStudent() {
+      const res = await fetch(`/api/result/${currentSubmissionId}`);
+      log('8B. Student Result Check (Locked during first 120s!)', await res.json());
+    }
+
+    async function testGetResultAdmin() {
+      const res = await fetch(`/api/result/${currentSubmissionId}`, {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      log('8C. Full Result + Topic Analytics + Paper Review', await res.json());
+    }
+
+    async function testAdminResultsList() {
+      const res = await fetch('/api/admin/results', {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      log('9A. Admin Results Table', await res.json());
+    }
+
+    async function testDeleteResult() {
+      if (!currentSubmissionId) return alert('No submission ID to delete!');
+      const res = await fetch(`/api/admin/results/${currentSubmissionId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      log('9B. Delete Individual Result', await res.json());
+    }
+  </script>
+</body>
+  </html>
+  

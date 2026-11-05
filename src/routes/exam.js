@@ -1,5 +1,5 @@
 // ============================================================================
-// FILE: src/routes/exam.js
+// FILE: src/routes/exam.jsb
 // PURPOSE: Live exam status, session creation, sanitized question delivery & grading
 // ============================================================================
 

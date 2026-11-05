@@ -11,73 +11,86 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
 
 :root {
-  /* 1. Primary Editorial Background Palette */
-  --bg-main: #F7F6F1;            /* Warm Ivory */
-  --bg-pearl: #F0EFE8;           /* Soft Pearl */
-  --bg-neutral: #E9E8DF;         /* Light Neutral */
+  /* 1. Backgrounds */
+  --bg-main: #F7F6F1;
+  --bg-pearl: #F0EFE8;
+  --bg-neutral: #E9E8DF;
 
-  /* 2. Frosted White Glassmorphism Surfaces */
-  --bg-card: rgba(255, 255, 255, 0.76);
-  --bg-card-solid: #FFFFFF;
+  /* 2. Surfaces */
+  --bg-card: rgba(255, 255, 255, 0.80);
+  --bg-card-solid: #FFFFFF;      /* use for question area */
   --bg-glass: rgba(247, 246, 241, 0.84);
   --bg-surface-subtle: rgba(240, 239, 232, 0.65);
   --bg-surface-elevated: rgba(255, 255, 255, 0.92);
 
-  /* 3. Borders & Delicate Highlights */
-  --border-subtle: rgba(37, 42, 37, 0.09);
-  --border-strong: rgba(37, 42, 37, 0.16);
-  --border-gold: rgba(181, 150, 92, 0.42);
+  /* 3. Borders */
+  --border-subtle: rgba(37, 42, 37, 0.10);
+  --border-strong: rgba(37, 42, 37, 0.20);
+  --border-gold: rgba(224, 169, 59, 0.55);
   --inner-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
 
-  /* 4. Editorial Typography Hierarchy */
-  --text-main: #252A25;          /* Deep Forest Charcoal */
-  --text-secondary: #62695F;     /* Muted Botanical Slate */
-  --text-muted: #858A80;         /* Warm Stone Muted */
+  /* 4. Text (all 4.8:1 or higher on every background) */
+  --text-main: #252A25;          /* 13.5:1 */
+  --text-secondary: #4C5349;     /* 7.3:1 */
+  --text-muted: #5F655B;         /* 5.5:1 */
+  --on-primary: #FFFFFF;
 
-  /* 5. Accents & Academic Status Colors (Zero Heavy Blue / Zero Neon) */
-  --primary: #B5965C;            /* Champagne Gold */
-  --primary-hover: #A9824D;      /* Warm Bronze */
-  --primary-soft: rgba(181, 150, 92, 0.13);
+  /* 5. Primary (gold) */
+  --primary: #8A6A2B;            /* buttons, white text 5.0:1 */
+  --primary-hover: #765A22;
+  --primary-bright: #E0A93B;     /* fills, icons, highlights only */
+  --primary-text: #7A5C25;       /* gold text, 5.4:1+ */
+  --primary-soft: rgba(224, 169, 59, 0.16);
 
-  --emerald: #54866A;            /* Muted Emerald (Answered / Right / Success) */
-  --emerald-hover: #436E56;
-  --emerald-soft: rgba(84, 134, 106, 0.12);
+  /* 6. Status: bright = fill/icon, text = readable */
+  --emerald: #2FA36B;            /* Answered / Correct */
+  --emerald-text: #2E6A49;
+  --emerald-hover: #25845A;
+  --emerald-soft: rgba(47, 163, 107, 0.15);
 
-  --sage: #8DA58A;               /* Soft Sage */
+  --amber: #F2A93B;              /* Skipped / Marked / Warning */
+  --amber-text: #855410;
+  --amber-soft: rgba(242, 169, 59, 0.20);
 
-  --amber: #C88A36;              /* Warm Amber (Skipped / Visited / Warning) */
-  --amber-soft: rgba(200, 138, 54, 0.13);
+  --rose: #E5534B;               /* Wrong / Error / Time critical */
+  --rose-text: #A23B35;
+  --rose-soft: rgba(229, 83, 75, 0.14);
 
-  --rose: #C25953;               /* Muted Coral Red (Wrong / Error) */
-  --rose-soft: rgba(194, 89, 83, 0.12);
+  --sage: #6FB58A;
+  --slate: #E9E8DF;              /* Unvisited */
+  --slate-text: #4C5349;
 
-  --slate: #E9E8DF;              /* Light Neutral Stone (Unvisited Palette State) */
-  --slate-text: #62695F;
+  /* 7. Timer states */
+  --timer-ok: var(--emerald);
+  --timer-warn: var(--amber);    /* last 5 minutes */
+  --timer-danger: var(--rose);   /* last minute, add pulse */
 
-  /* 6. Geometry, Shadows & Transitions */
+  /* 8. Focus ring (keyboard users) */
+  --focus-ring: 0 0 0 3px rgba(224, 169, 59, 0.5);
+
+  /* 9. Geometry */
   --radius-lg: 18px;
   --radius-md: 12px;
   --radius-sm: 8px;
 
-  --shadow-soft: 
-    0 12px 32px -8px rgba(37, 42, 37, 0.05),
-    0 4px 12px -2px rgba(37, 42, 37, 0.03),
+  /* 10. Shadows */
+  --shadow-soft:
+    0 12px 32px -8px rgba(37, 42, 37, 0.07),
+    0 4px 12px -2px rgba(37, 42, 37, 0.04),
     var(--inner-highlight);
-
-  --shadow-hover: 
-    0 18px 38px -10px rgba(37, 42, 37, 0.08),
-    0 6px 16px -3px rgba(37, 42, 37, 0.04),
+  --shadow-hover:
+    0 18px 38px -10px rgba(37, 42, 37, 0.11),
+    0 6px 16px -3px rgba(37, 42, 37, 0.06),
     var(--inner-highlight);
+  --shadow-modal:
+    0 24px 60px -12px rgba(37, 42, 37, 0.22),
+    0 8px 24px -4px rgba(37, 42, 37, 0.10);
 
-  --shadow-modal: 
-    0 24px 60px -12px rgba(37, 42, 37, 0.18),
-    0 8px 24px -4px rgba(37, 42, 37, 0.08);
-
+  /* 11. Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --transition-fast: 160ms var(--ease-out);
   --transition-smooth: 260ms var(--ease-out);
 }
-
 /* ============================================================================
    BASE RESET & EDITORIAL TYPOGRAPHY
    ============================================================================ */

@@ -1,1 +1,18 @@
+{
+  "name": "exam-platform",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:local": "wrangler d1 execute exam_db --local --file=./schema.sql",
+    "db:remote": "wrangler d1 execute exam_db --remote --file=./schema.sql"
+  },
+  "dependencies": {
+    "hono": "^4.6.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.80.0"
+  }
+}
 

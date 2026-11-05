@@ -1,5 +1,5 @@
 // ============================================================================
-// FILE: src/routes/exam.js
+// FILE: src/routes/exam.jsh
 // PURPOSE: Live exam status, session creation, shuffled question delivery & grading
 // ============================================================================
 

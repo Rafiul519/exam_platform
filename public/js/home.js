@@ -87,7 +87,7 @@ function startExamCountdown(scheduledAtSec) {
     if (remaining <= 0) {
       // Countdown finished! Unlock the Enter Name form
       clearInterval(countdownInterval);
-      badge.textContent = '● Live Now';
+      badge.textContent = 'Live Now';
       badge.className = 'badge badge-live';
       subtitle.textContent = 'Exam is open! Enter your name below to begin.';
       countdownWrapper.style.display = 'none';

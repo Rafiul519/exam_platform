@@ -1,6 +1,6 @@
 // ============================================================================
 // FILE: public/js/test.js
-// PURPOSE: 50-50-50 Chunk Loader, Mobile LocalStorage Offline Backup & Safe Submit
+// PURPOSE: 50-50-50 Chunk Loader, Mobile LocalStorage Offline Persistence & Safe Submit
 // ============================================================================
 
 let questions = [];
@@ -9,11 +9,10 @@ let questionStates = [];
 let totalSecondsElapsed = 0;
 let mainTimerInterval = null;
 let examTitle = 'Live Test';
-let storageKey = 'exam_offline_backup_default';
+let storageKey = 'exam_offline_default';
 let isLoadingPaper = false;
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Read token from sessionStorage or fallback to localStorage if mobile browser killed tab
   const token =
     sessionStorage.getItem('exam_session_token') ||
     localStorage.getItem('active_exam_session_token');
@@ -27,27 +26,23 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // Keep active token backed up in localStorage until exam is successfully submitted
+  // Backup session token in localStorage so page reload or tab close never logs out student
   sessionStorage.setItem('exam_session_token', token);
   sessionStorage.setItem('exam_student_name', studentName);
   localStorage.setItem('active_exam_session_token', token);
   localStorage.setItem('active_exam_student_name', studentName);
 
-  // Create a unique storage key for this specific student exam session
-  storageKey = getSessionStorageKey(token);
+  storageKey = 'exam_state_' + token.slice(-24);
 
-  const badgeEl = document.getElementById('studentNameBadge');
-  if (badgeEl) badgeEl.textContent = studentName;
+  document.getElementById('studentNameBadge').textContent = studentName;
 
-  // Track tab switches & immediately save state to mobile storage
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && questionStates[currentIndex]) {
       questionStates[currentIndex].tab_switches += 1;
-      saveExamStateToLocal();
+      saveStateToPhone();
     }
   });
 
-  // Bind navigation & modal buttons
   document.getElementById('prevBtn').addEventListener('click', () => {
     if (!isLoadingPaper) goToQuestion(currentIndex - 1);
   });
@@ -63,176 +58,104 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('cancelSubmitBtn').addEventListener('click', closeConfirmModal);
   document.getElementById('confirmFinalSubmitBtn').addEventListener('click', submitExamToServer);
 
-  // Initialize exam paper (from LocalStorage if reloaded, otherwise 50-50-50 chunk download)
-  initExamPaper(token);
+  loadLiveQuestions(token);
 });
 
-/**
- * Extracts unique sessionId from JWT so each exam attempt has its own clean storage key
- */
-function getSessionStorageKey(token) {
-  try {
-    const parts = String(token).split('.');
-    if (parts.length >= 2) {
-      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-      const payload = JSON.parse(atob(base64));
-      if (payload && payload.sessionId) {
-        return 'exam_backup_' + payload.sessionId;
-      }
-    }
-  } catch (e) {
-    // Fallback to token suffix
-  }
-  return 'exam_backup_' + String(token).slice(-24);
-}
-
-/**
- * Saves full questions, selected options, current question index, and timers to mobile localStorage
- */
-function saveExamStateToLocal() {
+function saveStateToPhone() {
   if (!questions || questions.length === 0) return;
   try {
-    const payload = {
-      examTitle: examTitle,
-      questions: questions,
-      questionStates: questionStates,
-      currentIndex: currentIndex,
-      totalSecondsElapsed: totalSecondsElapsed,
-      savedAt: Date.now()
-    };
-    localStorage.setItem(storageKey, JSON.stringify(payload));
-  } catch (err) {
-    // Ignore storage quota warnings
-  }
-}
-
-/**
- * Loads cached exam paper & student answers from mobile localStorage if available
- */
-function loadExamStateFromLocal() {
-  try {
-    const raw = localStorage.getItem(storageKey);
-    if (!raw) return false;
-    const data = JSON.parse(raw);
-    if (
-      data &&
-      Array.isArray(data.questions) &&
-      data.questions.length > 0 &&
-      Array.isArray(data.questionStates) &&
-      data.questionStates.length === data.questions.length
-    ) {
-      examTitle = data.examTitle || 'Live Test';
-      questions = data.questions;
-      questionStates = data.questionStates;
-      currentIndex =
-        typeof data.currentIndex === 'number' &&
-        data.currentIndex >= 0 &&
-        data.currentIndex < questions.length
-          ? data.currentIndex
-          : 0;
-      totalSecondsElapsed = Number(data.totalSecondsElapsed) || 0;
-      return true;
-    }
-  } catch (err) {
-    return false;
-  }
-  return false;
-}
-
-/**
- * Removes old exam caches from localStorage to keep phone memory clean
- */
-function cleanupOldExamBackups(keepKey) {
-  try {
-    const keysToRemove = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.indexOf('exam_backup_') === 0 && k !== keepKey) {
-        keysToRemove.push(k);
-      }
-    }
-    for (let i = 0; i < keysToRemove.length; i++) {
-      localStorage.removeItem(keysToRemove[i]);
-    }
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify({
+        examTitle,
+        questions,
+        questionStates,
+        currentIndex,
+        totalSecondsElapsed,
+      })
+    );
   } catch (e) {}
 }
 
-/**
- * Helper: Fetch with automatic retries so temporary mobile network drops never fail
- */
-async function fetchWithRetry(url, options, maxRetries) {
-  let lastError = null;
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const res = await fetch(url, options);
-      const data = await res.json();
-      return { res: res, data: data };
-    } catch (err) {
-      lastError = err;
-      if (attempt < maxRetries) {
-        await new Promise((resolve) => setTimeout(resolve, attempt * 1200));
-      }
+function restoreStateFromPhone() {
+  try {
+    const raw = localStorage.getItem(storageKey);
+    if (!raw) return false;
+    const saved = JSON.parse(raw);
+    if (
+      saved &&
+      Array.isArray(saved.questions) &&
+      saved.questions.length > 0 &&
+      Array.isArray(saved.questionStates) &&
+      saved.questionStates.length === saved.questions.length
+    ) {
+      examTitle = saved.examTitle || 'Live Test';
+      questions = saved.questions;
+      questionStates = saved.questionStates;
+      currentIndex =
+        typeof saved.currentIndex === 'number' &&
+        saved.currentIndex >= 0 &&
+        saved.currentIndex < questions.length
+          ? saved.currentIndex
+          : 0;
+      totalSecondsElapsed = Number(saved.totalSecondsElapsed) || 0;
+      return true;
     }
-  }
-  throw lastError || new Error('Network connection failed');
+  } catch (e) {}
+  return false;
 }
 
-/**
- * Step 1: Restore instantly from phone storage on reload, OR download in 50-50-50 chunks
- */
-async function initExamPaper(token) {
-  // 1. Check if paper + answers are already saved in mobile localStorage
-  if (loadExamStateFromLocal()) {
+async function fetchChunkWithRetry(url, token, retries = 3) {
+  let lastErr = null;
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      return data;
+    } catch (err) {
+      lastErr = err;
+      await new Promise((r) => setTimeout(r, 1000 * (i + 1)));
+    }
+  }
+  throw lastErr || new Error('Network error');
+}
+
+async function loadLiveQuestions(token) {
+  // 1. Instant offline restore if already saved in phone localStorage (reload / tab switch safe)
+  if (restoreStateFromPhone()) {
     document.getElementById('topExamName').textContent = examTitle;
     startUpwardStopwatch();
     goToQuestion(currentIndex);
     return;
   }
 
-  // 2. Otherwise download in safe 50-50-50 chunks from server
+  // 2. Progressive 50-50-50 chunk download
   isLoadingPaper = true;
-  setNavigationDisabled(true);
-  cleanupOldExamBackups(storageKey);
-
-  const qTextEl = document.getElementById('questionText');
-  const qNumEl = document.getElementById('qNumberDisplay');
-
   const CHUNK_SIZE = 50;
   let offset = 0;
   let hasMore = true;
-  let totalExpected = 0;
-  const allLoadedQuestions = [];
-  const seenQuestionIds = new Set();
+  const loadedQuestions = [];
+  const seenIds = new Set();
 
   try {
     while (hasMore) {
-      if (qNumEl) {
-        qNumEl.textContent =
-          totalExpected > 0
-            ? 'Loading (' + allLoadedQuestions.length + ' / ' + totalExpected + ')'
-            : 'Preparing Exam...';
-      }
-      if (qTextEl) {
-        qTextEl.textContent =
-          totalExpected > 0
-            ? 'Downloading exam paper in safe chunks... (' +
-              allLoadedQuestions.length +
-              ' / ' +
-              totalExpected +
-              ' questions saved to phone)'
-            : 'Connecting to exam server & downloading first 50 questions...';
-      }
+      document.getElementById('questionText').textContent =
+        loadedQuestions.length > 0
+          ? `Loading questions into phone memory... (${loadedQuestions.length} loaded)`
+          : 'Loading live questions (Batch 1)...';
 
-      const url = '/api/exam/questions?offset=' + offset + '&limit=' + CHUNK_SIZE;
-      const result = await fetchWithRetry(
-        url,
-        { headers: { Authorization: 'Bearer ' + token } },
-        4
+      const data = await fetchChunkWithRetry(
+        `/api/exam/questions?offset=${offset}&limit=${CHUNK_SIZE}`,
+        token,
+        3
       );
-      const data = result.data;
 
       if (!data || !data.success || !Array.isArray(data.questions)) {
-        throw new Error((data && data.error) || 'Failed to load question chunk.');
+        alert((data && data.error) || 'Could not load exam questions.');
+        window.location.href = '/';
+        return;
       }
 
       if (data.exam_name) {
@@ -240,27 +163,250 @@ async function initExamPaper(token) {
         document.getElementById('topExamName').textContent = examTitle;
       }
 
-      if (typeof data.total_questions === 'number' && data.total_questions > 0) {
-        totalExpected = data.total_questions;
-      }
-
-      // Add chunk questions with strict client-side duplicate ID filter
-      for (let i = 0; i < data.questions.length; i++) {
-        const q = data.questions[i];
-        const qId = String(q.id);
-        if (!seenQuestionIds.has(qId)) {
-          seenQuestionIds.add(qId);
-          allLoadedQuestions.push(q);
+      for (const q of data.questions) {
+        const idStr = String(q.id);
+        if (!seenIds.has(idStr)) {
+          seenIds.add(idStr);
+          loadedQuestions.push(q);
         }
       }
 
-      // Check if server ran in legacy mode (returned all questions at once) or chunked mode
-      if (data.has_more === undefined) {
-        hasMore = false;
-      } else {
-        hasMore = Boolean(data.has_more) && data.questions.length > 0;
+      if (data.has_more === true && data.questions.length > 0) {
         offset += data.questions.length;
+        hasMore = true;
+      } else {
+        hasMore = false;
+      }
+    }
+
+    if (loadedQuestions.length === 0) {
+      alert('No questions found in this exam.');
+      window.location.href = '/';
+      return;
+    }
+
+    questions = loadedQuestions;
+    questionStates = questions.map((q) => ({
+      question_id: q.id,
+      selected_option: null,
+      visited: false,
+      time_spent_sec: 0,
+      option_changes: 0,
+      tab_switches: 0,
+    }));
+
+    isLoadingPaper = false;
+    saveStateToPhone();
+    startUpwardStopwatch();
+    goToQuestion(0);
+  } catch (err) {
+    isLoadingPaper = false;
+    document.getElementById('questionText').innerHTML = `
+      <div style="color: #f87171; margin-bottom: 12px;">Network slow while loading questions.</div>
+      <button type="button" class="btn" onclick="location.reload()">🔄 Tap to Retry</button>
+    `;
+  }
+}
+
+function startUpwardStopwatch() {
+  if (mainTimerInterval) clearInterval(mainTimerInterval);
+
+  mainTimerInterval = setInterval(() => {
+    totalSecondsElapsed += 1;
+    if (questionStates[currentIndex]) {
+      questionStates[currentIndex].time_spent_sec += 1;
+      document.getElementById('qCurrentTimer').textContent = `${questionStates[currentIndex].time_spent_sec}s`;
+    }
+
+    const mins = Math.floor(totalSecondsElapsed / 60);
+    const secs = totalSecondsElapsed % 60;
+    document.getElementById('upwardTimer').textContent =
+      `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+    if (totalSecondsElapsed % 3 === 0) {
+      saveStateToPhone();
+    }
+  }, 1000);
+}
+
+function goToQuestion(index) {
+  if (index < 0 || index >= questions.length) return;
+
+  currentIndex = index;
+  const q = questions[currentIndex];
+  const state = questionStates[currentIndex];
+  state.visited = true;
+
+  saveStateToPhone();
+
+  document.getElementById('qNumberDisplay').textContent = `Question ${currentIndex + 1} of ${questions.length}`;
+  document.getElementById('qChapterBadge').textContent = `${q.chapter} • ${q.topic}`;
+  document.getElementById('qCurrentTimer').textContent = `${state.time_spent_sec}s`;
+  document.getElementById('questionText').textContent = q.question_text;
+
+  const optionsContainer = document.getElementById('optionsContainer');
+  optionsContainer.innerHTML = ['A', 'B', 'C', 'D']
+    .map((letter) => {
+      const isSelected = state.selected_option === letter;
+      return `
+        <button
+          type="button"
+          class="option-btn ${isSelected ? 'selected' : ''}"
+          onclick="selectOption('${letter}')"
+        >
+          <span class="opt-letter">${letter}</span>
+          <span>${escapeHtml(q.options[letter])}</span>
+        </button>
+      `;
+    })
+    .join('');
+
+  document.getElementById('prevBtn').disabled = currentIndex === 0;
+  const nextBtn = document.getElementById('nextBtn');
+  if (currentIndex === questions.length - 1) {
+    nextBtn.textContent = 'Review & Submit →';
+  } else {
+    nextBtn.textContent = 'Save & Next →';
+  }
+
+  renderPalette();
+}
+
+function handleNextButton() {
+  if (currentIndex === questions.length - 1) {
+    openConfirmModal();
+  } else {
+    goToQuestion(currentIndex + 1);
+  }
+}
+
+window.selectOption = function (letter) {
+  if (isLoadingPaper || !questionStates[currentIndex]) return;
+  const state = questionStates[currentIndex];
+  if (state.selected_option !== letter) {
+    if (state.selected_option !== null) {
+      state.option_changes += 1;
+    }
+    state.selected_option = letter;
+  }
+  saveStateToPhone();
+  goToQuestion(currentIndex);
+};
+
+function handleClearOrSkip() {
+  if (!questionStates[currentIndex]) return;
+  const state = questionStates[currentIndex];
+  state.selected_option = null;
+  state.visited = true;
+  saveStateToPhone();
+
+  if (currentIndex < questions.length - 1) {
+    goToQuestion(currentIndex + 1);
+  } else {
+    goToQuestion(currentIndex);
+  }
+}
+
+function renderPalette() {
+  let selectedCount = 0;
+  let skippedCount = 0;
+  let unvisitedCount = 0;
+
+  const grid = document.getElementById('paletteGrid');
+  grid.innerHTML = questionStates
+    .map((st, idx) => {
+      let statusClass = '';
+      if (st.selected_option) {
+        statusClass = 'answered';
+        selectedCount++;
+      } else if (st.visited) {
+        statusClass = 'skipped';
+        skippedCount++;
+      } else {
+        unvisitedCount++;
       }
 
-      // Safety break if all expected questions are already downloaded
-      if (totalExpected > 0 && allLoadedQuestions.length >=
+      const currentClass = idx === currentIndex ? 'current' : '';
+      return `
+        <button
+          type="button"
+          class="q-sheet-btn ${statusClass} ${currentClass}"
+          onclick="goToQuestion(${idx})"
+        >
+          ${idx + 1}
+        </button>
+      `;
+    })
+    .join('');
+
+  document.getElementById('countSelected').textContent = selectedCount;
+  document.getElementById('countSkipped').textContent = skippedCount;
+  document.getElementById('countUnvisited').textContent = unvisitedCount;
+}
+
+function openConfirmModal() {
+  saveStateToPhone();
+  const selectedCount = questionStates.filter((s) => s.selected_option !== null).length;
+  const skippedCount = questions.length - selectedCount;
+
+  document.getElementById('modalSelectedCount').textContent = selectedCount;
+  document.getElementById('modalSkippedCount').textContent = skippedCount;
+  document.getElementById('confirmSubmitModal').classList.add('active');
+}
+
+function closeConfirmModal() {
+  document.getElementById('confirmSubmitModal').classList.remove('active');
+}
+
+async function submitExamToServer() {
+  const btn = document.getElementById('confirmFinalSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  saveStateToPhone();
+
+  const token =
+    sessionStorage.getItem('exam_session_token') ||
+    localStorage.getItem('active_exam_session_token');
+
+  try {
+    const res = await fetch('/api/exam/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ responses: questionStates }),
+    });
+
+    const data = await res.json();
+    if (!data.success) {
+      alert((data.error || 'Failed to submit test.') + ' Your answers are safe on your phone.');
+      btn.disabled = false;
+      btn.textContent = 'Retry Submit (Answers Safe)';
+      return;
+    }
+
+    if (mainTimerInterval) clearInterval(mainTimerInterval);
+    localStorage.removeItem(storageKey);
+    localStorage.removeItem('active_exam_session_token');
+    localStorage.removeItem('active_exam_student_name');
+    sessionStorage.removeItem('exam_session_token');
+
+    closeConfirmModal();
+    window.location.href = `/result.html?id=${encodeURIComponent(data.submission_id)}`;
+  } catch (err) {
+    alert('Network weak while submitting! All your selected answers are 100% safe on your phone. Tap Retry Submit.');
+    btn.disabled = false;
+    btn.textContent = 'Retry Submit (Answers Safe)';
+  }
+}
+
+function escapeHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+  

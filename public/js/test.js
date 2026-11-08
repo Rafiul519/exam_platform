@@ -35,7 +35,20 @@ document.addEventListener('DOMContentLoaded', () => {
   storageKey = 'exam_state_' + token.slice(-24);
 
   document.getElementById('studentNameBadge').textContent = studentName;
-
+  // --- BROWSER BACK BUTTON GUARD (Prevents accidental exit to Home Page) ---
+  history.pushState(null, null, location.href);
+  window.addEventListener('popstate', (e) => {
+    history.pushState(null, null, location.href);
+    if (!isLoadingPaper && currentIndex > 0) {
+      goToQuestion(currentIndex - 1); // Back button dabane par pichhle question par jayega!
+    } else if (!isLoadingPaper && currentIndex === 0) {
+      // Agar first question par hai aur back dabaya, toh confirm modal dikha sakte hain ya rok sakte hain
+      if (confirm('Do you want to submit the test and exit?')) {
+        openConfirmModal();
+      }
+    }
+  });
+  
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && questionStates[currentIndex]) {
       questionStates[currentIndex].tab_switches += 1;
